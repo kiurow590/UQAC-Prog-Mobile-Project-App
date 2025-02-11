@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">UQAC-ProgMob-Project</string>
+    <string name="main_image_description">image principale</string>
+    <string name="green_button_text">One Phone Game</string>
+    <string name="gray_button_text">Multi Phone Game</string>
+</resources>
