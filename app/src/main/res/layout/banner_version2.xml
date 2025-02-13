@@ -5,12 +5,14 @@
     android:orientation="horizontal"
     android:padding="16dp">
 
-    <Button
+    <ImageButton
         android:id="@+id/back_button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back"
+        android:src="@drawable/baseline_keyboard_backspace_24"
+        android:contentDescription="@string/back_button_desc"
         android:layout_gravity="start"
+        android:background="?attr/selectableItemBackgroundBorderless"
         />
 
     <LinearLayout
