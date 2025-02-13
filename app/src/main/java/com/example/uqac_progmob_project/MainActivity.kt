@@ -1,5 +1,6 @@
 package com.example.uqac_progmob_project
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.greenButton.setOnClickListener {
             Toast.makeText(this, "Bouton Vert cliqué !", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, GameChoose::class.java)
+            startActivity(intent)
         }
 
         binding.grayButton.setOnClickListener {
