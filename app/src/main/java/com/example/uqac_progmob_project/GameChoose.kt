@@ -1,5 +1,6 @@
 package com.example.uqac_progmob_project
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.uqac_progmob_project.databinding.GameChooseBinding
@@ -21,6 +22,12 @@ class GameChoose : AppCompatActivity() {
         // Configurer le bouton retour pour fermer l'activité en cours
         backButton.setOnClickListener {
             finish()
+        }
+
+
+        accountbutton.setOnClickListener {
+            val dialog = AccountDialogFragment()
+            dialog.show(supportFragmentManager, "AccountDialogFragment")
         }
     }
 }
