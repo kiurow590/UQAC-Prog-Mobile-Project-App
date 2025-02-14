@@ -3,4 +3,7 @@
     <string name="main_image_description">image principale</string>
     <string name="green_button_text">One Phone Game</string>
     <string name="gray_button_text">Multi Phone Game</string>
+    <string name="back_button_desc">Back</string>
+    <string name="button1_desc">Button 1</string>
+    <string name="button2_desc">Button 2</string>
 </resources>
