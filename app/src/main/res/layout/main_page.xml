@@ -18,7 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="32dp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/green_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,9 +29,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="32dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/gray_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,9 +44,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/quit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,6 +59,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -43,6 +43,8 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.material:material:1.12.0")
+
     implementation (libs.androidx.credentials)
     implementation (libs.androidx.credentials.play.services.auth)
     implementation (libs.googleid)
