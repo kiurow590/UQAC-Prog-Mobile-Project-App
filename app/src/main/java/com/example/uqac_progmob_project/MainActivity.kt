@@ -29,5 +29,11 @@ class MainActivity : AppCompatActivity() {
         binding.quitButton.setOnClickListener {
             finishAndRemoveTask()
         }
+
+        // Configurer le bouton de paramètres pour ouvrir le fragment de dialogue
+        binding.settingsButton.setOnClickListener {
+            val dialog = SettingsDialogFragment()
+            dialog.show(supportFragmentManager, "SettingsDialogFragment")
+        }
     }
 }
