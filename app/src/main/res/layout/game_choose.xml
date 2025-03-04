@@ -24,8 +24,7 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Title"
-            android:textSize="24sp"
+                        android:textSize="24sp"
             android:padding="16dp"
             android:background="@drawable/common_google_signin_btn_icon_dark"
             app:layout_constraintTop_toBottomOf="@id/top_banner"
@@ -48,7 +47,7 @@
                 android:id="@+id/game_button1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Game 1"
+                android:text="@string/triMannGame"
                 android:layout_row="0"
                 android:layout_column="0"/>
 
@@ -56,7 +55,7 @@
                 android:id="@+id/game_button2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Game 2"
+                android:text="@string/bleiz_garou"
                 android:layout_row="0"
                 android:layout_column="1"/>
 
@@ -64,7 +63,7 @@
                 android:id="@+id/game_button3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Game 3"
+                android:text="@string/course_e_pic"
                 android:layout_row="1"
                 android:layout_column="0"/>
 
@@ -72,7 +71,7 @@
                 android:id="@+id/game_button4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Game 4"
+                android:text="@string/et_boom"
                 android:layout_row="1"
                 android:layout_column="1"/>
         </GridLayout>

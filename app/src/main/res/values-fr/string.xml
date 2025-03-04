@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UQAC-ProgMob-Projet</string>
+    <string name="main_image_description">image principale</string>
+    <string name="green_button_text">Jeu pour un téléphone</string>
+    <string name="gray_button_text">Jeu pour plusieurs téléphones</string>
+    <string name="back_button_desc">Retour</string>
+    <string name="button1_desc">Bouton 1</string>
+    <string name="button2_desc">Bouton 2</string>
+    <string name="settings_button_description">Bouton de paramètres</string>
+    <string name="account">Compte</string>
+    <string name="global_score">Score Global: </string>
+    <string name="select_language">Selection Langue</string>
+    <string name="volume_level">Niveau de son</string>
+    <string name="triMannGame">Tri Mann</string>
+    <string name="bleiz_garou">Bleiz-garou</string>
+    <string name="course_e_pic">Course e pic</string>
+    <string name="et_boom">Et Boom!</string>
+    <string name="quit">Quitter</string>
+    <string name="game_rules">Règles du jeu</string>
+    <string name="settings">Paramètres</string>
+</resources>

@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.uqac_progmob_project.databinding.MainPageBinding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var binding: MainPageBinding
 
@@ -28,6 +28,12 @@ class MainActivity : AppCompatActivity() {
 
         binding.quitButton.setOnClickListener {
             finishAndRemoveTask()
+        }
+
+        // Configurer le bouton de paramètres pour ouvrir le fragment de dialogue
+        binding.settingsButton.setOnClickListener {
+            val dialog = SettingsDialogFragment()
+            dialog.show(supportFragmentManager, "SettingsDialogFragment")
         }
     }
 }

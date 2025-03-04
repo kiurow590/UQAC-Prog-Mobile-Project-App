@@ -52,7 +52,7 @@
         android:id="@+id/quit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Quit"
+        android:text="@string/quit"
         android:backgroundTint="@color/red"
         app:layout_constraintTop_toBottomOf="@id/gray_button"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,5 +62,13 @@
         android:layout_marginEnd="16dp"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         />
-
+    <ImageButton
+        android:id="@+id/settings_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_preferences"
+        android:contentDescription="@string/settings_button_description"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

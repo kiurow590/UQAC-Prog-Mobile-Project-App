@@ -15,7 +15,8 @@ class AccountDialogFragment : DialogFragment() {
 
         // Configurez les informations de l'utilisateur ici
         binding.userPseudo.text = "UserPseudo"
-        binding.globalScore.text = "Global Score: 1234"
+        // on utilise une string pour le score concaténé avec le score
+        binding.globalScore.text = getString(R.string.global_score) + " 0"
 
         // Set up the close button to dismiss the dialog
         binding.root.findViewById<ImageButton>(R.id.back_button2).setOnClickListener {
