@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Language"
+        android:text="@string/select_language"
         android:paddingTop="8dp"
         android:paddingBottom="4dp"/>
     <Spinner
@@ -22,7 +22,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Volume Level"
+        android:text="@string/volume_level"
         android:paddingTop="16dp"
         android:paddingBottom="4dp"/>
     <SeekBar

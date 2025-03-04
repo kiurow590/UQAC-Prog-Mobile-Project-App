@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.uqac_progmob_project.databinding.GameChooseBinding
 
-class GameChoose : AppCompatActivity() {
+class GameChoose : BaseActivity() {
     private lateinit var binding: GameChooseBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
