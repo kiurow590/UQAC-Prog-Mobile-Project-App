@@ -61,7 +61,7 @@ class SettingsDialogFragment : DialogFragment() {
 
         return AlertDialog.Builder(requireContext())
             .setView(binding.root)
-            .setTitle("Settings")
+            .setTitle(getString(R.string.settings))
             .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
             .create()
     }

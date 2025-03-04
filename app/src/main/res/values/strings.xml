@@ -16,4 +16,7 @@
     <string name="course_e_pic">Course e pic</string>
     <string name="et_boom">Et Boom!</string>
     <string name="quit">Quit</string>
+    <string name="game_rules">Game Rules</string>
+    <string name="settings">Settings</string>
+
 </resources>
