@@ -72,7 +72,7 @@ class GameSessionActivity : AppCompatActivity() {
         container.removeAllViews()
         for (i in 1..numberOfPlayers) {
             val playerNameEditText = EditText(this).apply {
-                hint = "Nom du joueur $i"
+                hint = "${getString(R.string.playerName)} $i"
             }
             container.addView(playerNameEditText)
         }
