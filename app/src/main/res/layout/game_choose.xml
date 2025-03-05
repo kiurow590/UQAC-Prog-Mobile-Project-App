@@ -44,7 +44,7 @@
             android:layout_marginTop="16dp">
 
             <Button
-                android:id="@+id/game_button1"
+                android:id="@+id/game_trimann"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/triMannGame"
@@ -52,7 +52,7 @@
                 android:layout_column="0"/>
 
             <Button
-                android:id="@+id/game_button2"
+                android:id="@+id/game_bleizGarou"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/bleiz_garou"
@@ -60,7 +60,7 @@
                 android:layout_column="1"/>
 
             <Button
-                android:id="@+id/game_button3"
+                android:id="@+id/game_courseEPic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/course_e_pic"
@@ -68,7 +68,7 @@
                 android:layout_column="0"/>
 
             <Button
-                android:id="@+id/game_button4"
+                android:id="@+id/game_etBoom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/et_boom"
