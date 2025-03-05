@@ -1,0 +1,31 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <include
+        android:id="@+id/topBanner"
+        layout="@layout/banner_version3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:id="@+id/historyTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/history_game"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_below="@id/topBanner"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp" />
+
+    <ExpandableListView
+        android:id="@+id/historyExpandableListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/historyTitle"
+        android:layout_marginTop="16dp" />
+</RelativeLayout>
