@@ -1,5 +1,6 @@
 package com.example.uqac_progmob_project
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -28,26 +29,10 @@ class GameDetailActivity : AppCompatActivity() {
 
 
         binding.playButton.setOnClickListener {
-            // Logique pour démarrer le jeu
-            // en fonction du jeu on joue un Toast
-            when (gameName) {
-                "Trimann" -> {
-                    // Démarrer le jeu Trimann
-                    Toast.makeText(this, "Démarrer le jeu Trimann", Toast.LENGTH_SHORT).show()
-                }
-                "Bleiz Garou" -> {
-                    // Démarrer le jeu Bleiz Garou
-                    Toast.makeText(this, "Démarrer le jeu Bleiz Garou", Toast.LENGTH_SHORT).show()
-                }
-                "Course E-Pic" -> {
-                    // Démarrer le jeu Course E-Pic
-                    Toast.makeText(this, "Démarrer le jeu Course E-Pic", Toast.LENGTH_SHORT).show()
-                }
-                "Et Boom" -> {
-                    // Démarrer le jeu Et Boom
-                    Toast.makeText(this, "Démarrer le jeu Et Boom", Toast.LENGTH_SHORT).show()
-                }
+            val intent = Intent(this, GameSessionActivity::class.java).apply {
+                putExtra("GAME_NAME", gameName)
             }
+            startActivity(intent)
         }
     }
 }
