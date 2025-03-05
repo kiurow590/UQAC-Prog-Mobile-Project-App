@@ -12,11 +12,14 @@
     <string name="select_language">Select Language</string>
     <string name="volume_level">Volume Level</string>
     <string name="triMannGame">Tri Mann</string>
+    <string name="triMannGameDescription"> Tri Mann Game Description</string>
     <string name="bleiz_garou">Bleiz-garou</string>
+    <string name="bleiz_garou_Description">Bleiz Garou Game Description</string>
     <string name="course_e_pic">Course e pic</string>
+    <string name="course_e_pic_description">Course E-Pic Game Description</string>
     <string name="et_boom">Et Boom!</string>
+    <string name="et_boom_description">Et Boom Game Description</string>
     <string name="quit">Quit</string>
     <string name="game_rules">Game Rules</string>
     <string name="settings">Settings</string>
-
 </resources>

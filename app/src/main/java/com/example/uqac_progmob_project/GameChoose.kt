@@ -29,5 +29,33 @@ class GameChoose : BaseActivity() {
             val dialog = AccountDialogFragment()
             dialog.show(supportFragmentManager, "AccountDialogFragment")
         }
+
+        binding.gameTrimann.setOnClickListener {
+            startGameDetailActivity(getString(R.string.triMannGame), getString(R.string.triMannGameDescription))
+        }
+
+        binding.gameBleizGarou.setOnClickListener {
+            startGameDetailActivity(getString(R.string.bleiz_garou), getString(R.string.bleiz_garou_Description))
+        }
+
+        binding.gameCourseEPic.setOnClickListener {
+            startGameDetailActivity(getString(R.string.course_e_pic), getString(R.string.course_e_pic_description))
+        }
+
+        binding.gameEtBoom.setOnClickListener {
+            startGameDetailActivity(getString(R.string.et_boom), getString(R.string.et_boom_description))
+        }
+
+    }
+
+    /**
+     * Démarrer l'activité de détail du jeu
+     */
+    private fun startGameDetailActivity(gameName: String, gameDescription: String) {
+        val intent = Intent(this, GameDetailActivity::class.java).apply {
+            putExtra("GAME_NAME", gameName)
+            putExtra("GAME_DESCRIPTION", gameDescription)
+        }
+        startActivity(intent)
     }
 }

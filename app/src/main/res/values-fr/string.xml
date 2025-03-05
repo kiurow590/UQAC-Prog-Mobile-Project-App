@@ -13,9 +13,13 @@
     <string name="select_language">Selection Langue</string>
     <string name="volume_level">Niveau de son</string>
     <string name="triMannGame">Tri Mann</string>
+    <string name="triMannGameDescription">Description du jeu Trimann</string>
     <string name="bleiz_garou">Bleiz-garou</string>
+    <string name="bleiz_garou_Description">Description du jeu Bleiz Garou</string>
     <string name="course_e_pic">Course e pic</string>
+    <string name="course_e_pic_description">Description du jeu Course E-Pic</string>
     <string name="et_boom">Et Boom!</string>
+    <string name="et_boom_description">Description du jeu Et Boom</string>
     <string name="quit">Quitter</string>
     <string name="game_rules">Règles du jeu</string>
     <string name="settings">Paramètres</string>
