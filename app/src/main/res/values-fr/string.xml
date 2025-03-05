@@ -23,4 +23,7 @@
     <string name="quit">Quitter</string>
     <string name="game_rules">Règles du jeu</string>
     <string name="settings">Paramètres</string>
+    <string name="PartyGameName">Nom de la partie</string>
+    <string name="startGame">Démarrer</string>
+    <string name="playerName">Nom du joueur</string>
 </resources>
