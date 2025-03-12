@@ -26,6 +26,7 @@
         <activity android:name=".GameChoose"/>
         <activity android:name=".GameDetailActivity" />
         <activity android:name=".GameSessionActivity" />
+        <activity android:name=".GameHistoryActivity" />
     </application>
 
 </manifest>

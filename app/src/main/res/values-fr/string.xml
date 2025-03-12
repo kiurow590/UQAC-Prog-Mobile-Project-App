@@ -26,4 +26,6 @@
     <string name="PartyGameName">Nom de la partie</string>
     <string name="startGame">Démarrer</string>
     <string name="playerName">Nom du joueur</string>
+    <string name="history_game">Historique de jeux</string>
+
 </resources>

@@ -24,7 +24,10 @@ class GameChoose : BaseActivity() {
             finish()
         }
 
-
+        historybutton.setOnClickListener {
+            val intent = Intent(this, GameHistoryActivity::class.java)
+            startActivity(intent)
+        }
         accountbutton.setOnClickListener {
             val dialog = AccountDialogFragment()
             dialog.show(supportFragmentManager, "AccountDialogFragment")
