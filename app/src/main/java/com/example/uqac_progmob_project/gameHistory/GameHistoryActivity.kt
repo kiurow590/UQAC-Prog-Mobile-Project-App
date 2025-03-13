@@ -1,8 +1,9 @@
-package com.example.uqac_progmob_project
+package com.example.uqac_progmob_project.gameHistory
 
 import android.os.Bundle
 import android.widget.ExpandableListView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.databinding.ActivityGameHistoryBinding
 
 class GameHistoryActivity : AppCompatActivity() {

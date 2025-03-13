@@ -1,4 +1,4 @@
-package com.example.uqac_progmob_project
+package com.example.uqac_progmob_project.gameChoose
 
 import android.os.Bundle
 import android.widget.Button
@@ -7,9 +7,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.databinding.ActivityGameSessionBinding
 
-class GameSessionActivity : AppCompatActivity() {
+class GameSettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGameSessionBinding
     private var numberOfPlayers = 2
 

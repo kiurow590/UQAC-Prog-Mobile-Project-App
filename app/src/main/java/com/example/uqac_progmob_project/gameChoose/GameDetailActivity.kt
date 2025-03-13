@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
-import com.example.uqac_progmob_project.GameSessionActivity
+import com.example.uqac_progmob_project.gameChoose.GameSettingsActivity
 
 class GameDetailActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +41,7 @@ class GameDetailActivity : BaseActivity() {
                 gameDescription = gameDescription,
                 onBackClick = { finish() },
                 onPlayClick = {
-                    val intent = Intent(this, GameSessionActivity::class.java).apply {
+                    val intent = Intent(this, GameSettingsActivity::class.java).apply {
                         putExtra("GAME_NAME", gameName)
                     }
                     startActivity(intent)
