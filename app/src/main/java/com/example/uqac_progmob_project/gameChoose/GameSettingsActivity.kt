@@ -1,81 +1,142 @@
 package com.example.uqac_progmob_project.gameChoose
-
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.example.uqac_progmob_project.R
-import com.example.uqac_progmob_project.databinding.ActivityGameSessionBinding
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.uqac_progmob_project.BaseActivity
 
-class GameSettingsActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityGameSessionBinding
-    private var numberOfPlayers = 2
-
+class GameSettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
-        binding = ActivityGameSessionBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        val backButton = binding.topBanner.backButton3
-        backButton.setOnClickListener {
-            finish()
-        }
+        val gameName = intent.getStringExtra("GAME_NAME") ?: ""
 
-        val gameName = intent.getStringExtra("GAME_NAME")
-        binding.gameNameTextView.text = gameName
+        setContent {
 
-        val gameSessionNameEditText = findViewById<EditText>(R.id.gameSessionNameEditText)
-        val numberOfPlayersTextView = findViewById<TextView>(R.id.numberOfPlayersTextView)
-        val playersContainer = findViewById<LinearLayout>(R.id.playersContainer)
-        val decreasePlayersButton = findViewById<Button>(R.id.decreasePlayersButton)
-        val increasePlayersButton = findViewById<Button>(R.id.increasePlayersButton)
+                GameSettingsScreen(
+                    gameName = gameName,
+                    onBackClick = { finish() },
+                    onPlayClick = { gameSessionName, playerNames ->
+                        // Logique pour démarrer le jeu
+                        println("Game Session Name: $gameSessionName")
+                        println("Number of Players: ${playerNames.size}")
+                        println("Player Names: $playerNames")
 
-        decreasePlayersButton.setOnClickListener {
-            if (numberOfPlayers > 2) {
-                numberOfPlayers--
-                numberOfPlayersTextView.text = numberOfPlayers.toString()
-                updatePlayerFields(playersContainer)
-            }
-        }
+                        Toast.makeText(this, "Démarrer le jeu $gameName", Toast.LENGTH_SHORT).show()
+                    }
+                )
 
-        increasePlayersButton.setOnClickListener {
-            if (numberOfPlayers < 5) {
-                numberOfPlayers++
-                numberOfPlayersTextView.text = numberOfPlayers.toString()
-                updatePlayerFields(playersContainer)
-            }
-        }
-
-        updatePlayerFields(playersContainer)
-
-        binding.playButton.setOnClickListener {
-            val gameSessionName = gameSessionNameEditText.text.toString()
-            val playerNames = mutableListOf<String>()
-            for (i in 0 until playersContainer.childCount) {
-                val playerNameEditText = playersContainer.getChildAt(i) as EditText
-                playerNames.add(playerNameEditText.text.toString())
-            }
-
-            // Logique pour démarrer le jeu
-            println("Game Session Name: $gameSessionName")
-            println("Number of Players: $numberOfPlayers")
-            println("Player Names: $playerNames")
-
-            Toast.makeText(this, "Démarrer le jeu $gameName", Toast.LENGTH_SHORT).show()
         }
     }
+}
 
-    private fun updatePlayerFields(container: LinearLayout) {
-        container.removeAllViews()
-        for (i in 1..numberOfPlayers) {
-            val playerNameEditText = EditText(this).apply {
-                hint = "${getString(R.string.playerName)} $i"
+@Composable
+fun GameSettingsScreen(
+    gameName: String,
+    onBackClick: () -> Unit,
+    onPlayClick: (String, List<String>) -> Unit
+) {
+    var gameSessionName by remember { mutableStateOf("") }
+    var numberOfPlayers by remember { mutableStateOf(2) }
+    val playerNames = remember { mutableStateListOf("", "") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        //verticalArrangement = Arrangement.Center,
+        //horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row {
+            IconButton(onClick = onBackClick) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
-            container.addView(playerNameEditText)
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = gameName, fontSize = 24.sp)
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        BasicTextField(
+            value = gameSessionName,
+            onValueChange = { gameSessionName = it },
+            modifier = Modifier.fillMaxWidth(),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    if (gameSessionName.isEmpty()) {
+                        Text(text = "Game Session Name", color = Color.Gray)
+                    }
+                    innerTextField()
+                }
+            }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(onClick = {
+                if (numberOfPlayers > 2) {
+                    numberOfPlayers--
+                    playerNames.removeAt(playerNames.size - 1)
+                }
+            }) {
+                Text(text = "-")
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = numberOfPlayers.toString(), fontSize = 16.sp)
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = {
+                if (numberOfPlayers < 5) {
+                    numberOfPlayers++
+                    playerNames.add("")
+                }
+            }) {
+                Text(text = "+")
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Column {
+            for (i in 0 until numberOfPlayers) {
+                BasicTextField(
+                    value = playerNames[i],
+                    onValueChange = { playerNames[i] = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        ) {
+                            if (playerNames[i].isEmpty()) {
+                                Text(text = "Player Name ${i + 1}", color = Color.Gray)
+                            }
+                            innerTextField()
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = { onPlayClick(gameSessionName, playerNames) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Play")
         }
     }
 }
