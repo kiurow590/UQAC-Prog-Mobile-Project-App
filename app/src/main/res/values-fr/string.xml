@@ -8,7 +8,7 @@
     <string name="button1_desc">Bouton 1</string>
     <string name="button2_desc">Bouton 2</string>
     <string name="settings_button_description">Bouton de paramètres</string>
-    <string name="account">Compte</string>
+    <string name="account">Informations du compte</string>
     <string name="global_score">Score Global: </string>
     <string name="select_language">Selection Langue</string>
     <string name="volume_level">Niveau de son</string>
@@ -27,5 +27,7 @@
     <string name="startGame">Démarrer</string>
     <string name="playerName">Nom du joueur</string>
     <string name="history_game">Historique de jeux</string>
+    <string name="language">Langue</string>
+    <string name="gamechoose">Choix du jeu</string>
 
 </resources>

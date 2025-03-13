@@ -7,7 +7,7 @@
     <string name="button1_desc">Button 1</string>
     <string name="button2_desc">Button 2</string>
     <string name="settings_button_description">Settings Button</string>
-    <string name="account">Account</string>
+    <string name="account">Account Information</string>
     <string name="global_score">Global Score: </string>
     <string name="select_language">Select Language</string>
     <string name="volume_level">Volume Level</string>
@@ -26,4 +26,6 @@
     <string name="startGame">Start</string>
     <string name="playerName">Player Name</string>
     <string name="history_game">History Game</string>
+    <string name="language">Language</string>
+    <string name="gamechoose">Choose Game</string>
 </resources>

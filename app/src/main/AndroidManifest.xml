@@ -13,20 +13,18 @@
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.UQACProgMobProject">
+            android:name=".mainActivity.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GameChoose"/>
-        <activity android:name=".GameDetailActivity" />
-        <activity android:name=".GameSessionActivity" />
-        <activity android:name=".GameHistoryActivity" />
+        <activity android:name=".gameChoose.GameChoose"/>
+        <activity android:name=".gameChoose.GameDetailActivity" />
+        <activity android:name=".gameChoose.GameSettingsActivity" />
+        <activity android:name=".gameHistory.GameHistoryActivity" />
     </application>
 
 </manifest>
