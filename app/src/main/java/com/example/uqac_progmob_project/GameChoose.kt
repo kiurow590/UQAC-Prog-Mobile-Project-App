@@ -2,58 +2,42 @@ package com.example.uqac_progmob_project
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import com.example.uqac_progmob_project.databinding.GameChooseBinding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
-class GameChoose : BaseActivity() {
-    private lateinit var binding: GameChooseBinding
-
+class GameChoose : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
-        binding = GameChooseBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // Accéder aux éléments de la bannière
-        val backButton = binding.topBanner.backButton
-        val historybutton = binding.topBanner.history
-        val accountbutton = binding.topBanner.account
-
-        // Configurer le bouton retour pour fermer l'activité en cours
-        backButton.setOnClickListener {
-            finish()
+        setContent {
+            GameChooseScreen(
+                onBackClick = { finish() },
+                onHistoryClick = {
+                    startActivity(Intent(this, GameHistoryActivity::class.java))
+                },
+                onAccountClick = {
+                    val dialog = AccountDialogFragment()
+                    dialog.show(supportFragmentManager, "AccountDialogFragment")
+                },
+                onGameClick = { gameName, gameDescription ->
+                    startGameDetailActivity(gameName, gameDescription)
+                }
+            )
         }
-
-        historybutton.setOnClickListener {
-            val intent = Intent(this, GameHistoryActivity::class.java)
-            startActivity(intent)
-        }
-        accountbutton.setOnClickListener {
-            val dialog = AccountDialogFragment()
-            dialog.show(supportFragmentManager, "AccountDialogFragment")
-        }
-
-        binding.gameTrimann.setOnClickListener {
-            startGameDetailActivity(getString(R.string.triMannGame), getString(R.string.triMannGameDescription))
-        }
-
-        binding.gameBleizGarou.setOnClickListener {
-            startGameDetailActivity(getString(R.string.bleiz_garou), getString(R.string.bleiz_garou_Description))
-        }
-
-        binding.gameCourseEPic.setOnClickListener {
-            startGameDetailActivity(getString(R.string.course_e_pic), getString(R.string.course_e_pic_description))
-        }
-
-        binding.gameEtBoom.setOnClickListener {
-            startGameDetailActivity(getString(R.string.et_boom), getString(R.string.et_boom_description))
-        }
-
     }
 
-    /**
-     * Démarrer l'activité de détail du jeu
-     */
     private fun startGameDetailActivity(gameName: String, gameDescription: String) {
         val intent = Intent(this, GameDetailActivity::class.java).apply {
             putExtra("GAME_NAME", gameName)
@@ -61,4 +45,95 @@ class GameChoose : BaseActivity() {
         }
         startActivity(intent)
     }
+}
+
+@Composable
+fun GameChooseScreen(
+    onBackClick: () -> Unit,
+    onHistoryClick: () -> Unit,
+    onAccountClick: () -> Unit,
+    onGameClick: (String, String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        TopBanner(
+            onBackClick = onBackClick,
+            onHistoryClick = onHistoryClick,
+            onAccountClick = onAccountClick
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Liste des jeux sous forme de grille 2x2
+        val games = listOf(
+            "TriMann Game" to "TriMann Game Description",
+            "Bleiz Garou" to "Bleiz Garou Description",
+            "Course E Pic" to "Course E Pic Description",
+            "Et Boom" to "Et Boom Description"
+        )
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2), // ✅ Grille 2x2
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(games) { (title, description) ->
+                GameButton(text = title, description = description, onClick = onGameClick)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBanner(
+    onBackClick: () -> Unit,
+    onHistoryClick: () -> Unit,
+    onAccountClick: () -> Unit
+) {
+    TopAppBar(
+        title = { Text("Game Choose") },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            }
+        },
+        actions = {
+            IconButton(onClick = onHistoryClick) {
+                Icon(Icons.Filled.Info, contentDescription = "History")
+            }
+            IconButton(onClick = onAccountClick) {
+                Icon(Icons.Default.Person, contentDescription = "Account")
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.White,
+            titleContentColor = Color.Black,
+            actionIconContentColor = Color.Black
+        )
+    )
+}
+
+@Composable
+fun GameButton(text: String, description: String, onClick: (String, String) -> Unit) {
+    Button(
+        onClick = { onClick(text, description) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Text(text)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewGameChooseScreen() {
+    GameChooseScreen(
+        onBackClick = {},
+        onHistoryClick = {},
+        onAccountClick = {},
+        onGameClick = { _, _ -> }
+    )
 }
