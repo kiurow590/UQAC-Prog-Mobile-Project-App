@@ -21,7 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GameChoose"/>
+        <activity android:name=".gameChoose.GameChoose"/>
         <activity android:name=".GameDetailActivity" />
         <activity android:name=".GameSessionActivity" />
         <activity android:name=".GameHistoryActivity" />

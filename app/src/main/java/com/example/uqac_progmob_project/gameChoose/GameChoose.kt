@@ -1,4 +1,4 @@
-package com.example.uqac_progmob_project
+package com.example.uqac_progmob_project.gameChoose
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,8 +14,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.uqac_progmob_project.AccountDialogFragment
+import com.example.uqac_progmob_project.GameDetailActivity
+import com.example.uqac_progmob_project.GameHistoryActivity
+import com.example.uqac_progmob_project.R
 
 class GameChoose : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,10 +70,10 @@ fun GameChooseScreen(
 
         // Liste des jeux sous forme de grille 2x2
         val games = listOf(
-            "TriMann Game" to "TriMann Game Description",
-            "Bleiz Garou" to "Bleiz Garou Description",
-            "Course E Pic" to "Course E Pic Description",
-            "Et Boom" to "Et Boom Description"
+            stringResource(id = R.string.triMannGame) to stringResource(id = R.string.triMannGameDescription),
+            stringResource(id = R.string.bleiz_garou) to stringResource(id = R.string.bleiz_garou_Description),
+            stringResource(id = R.string.course_e_pic) to stringResource(id = R.string.course_e_pic_description),
+            stringResource(id = R.string.et_boom) to stringResource(id = R.string.et_boom_description)
         )
 
         LazyVerticalGrid(

@@ -21,7 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.example.uqac_progmob_project.R // Remplace par ton vrai package
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.uqac_progmob_project.GameChoose
+import com.example.uqac_progmob_project.gameChoose.GameChoose
 import com.example.uqac_progmob_project.settings.SettingsDialog
 
 /**
