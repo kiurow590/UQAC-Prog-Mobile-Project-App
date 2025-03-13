@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".gameChoose.GameChoose"/>
-        <activity android:name=".GameDetailActivity" />
+        <activity android:name=".gameChoose.GameDetailActivity" />
         <activity android:name=".GameSessionActivity" />
         <activity android:name=".GameHistoryActivity" />
     </application>
