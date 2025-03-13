@@ -26,4 +26,6 @@
     <string name="startGame">Start</string>
     <string name="playerName">Player Name</string>
     <string name="history_game">History Game</string>
+    <string name="language">Language</string>
+
 </resources>
