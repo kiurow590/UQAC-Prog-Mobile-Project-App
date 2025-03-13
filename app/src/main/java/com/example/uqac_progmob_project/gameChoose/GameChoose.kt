@@ -12,34 +12,45 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.uqac_progmob_project.AccountDialogFragment
 import com.example.uqac_progmob_project.GameDetailActivity
 import com.example.uqac_progmob_project.GameHistoryActivity
 import com.example.uqac_progmob_project.R
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 class GameChoose : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContent {
+            var showDialog by remember { mutableStateOf(false) }
+
             GameChooseScreen(
                 onBackClick = { finish() },
                 onHistoryClick = {
                     startActivity(Intent(this, GameHistoryActivity::class.java))
                 },
                 onAccountClick = {
-                    val dialog = AccountDialogFragment()
-                    dialog.show(supportFragmentManager, "AccountDialogFragment")
+                    showDialog = true
                 },
                 onGameClick = { gameName, gameDescription ->
                     startGameDetailActivity(gameName, gameDescription)
                 }
             )
+
+            if (showDialog) {
+                AccountDialog(
+                    onDismissRequest = { showDialog = false },
+                    onConfirmClick = { showDialog = false }
+                )
+            }
         }
     }
 
@@ -98,7 +109,7 @@ fun TopBanner(
     onAccountClick: () -> Unit
 ) {
     TopAppBar(
-        title = { Text("Game Choose") },
+        title = {stringResource(id = R.string.gamechoose) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
