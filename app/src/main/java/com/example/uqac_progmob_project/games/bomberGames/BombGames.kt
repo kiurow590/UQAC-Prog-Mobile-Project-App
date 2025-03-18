@@ -46,6 +46,7 @@ import androidx.core.app.ActivityCompat
 import com.example.uqac_progmob_project.R
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,11 +57,12 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 
 import android.util.Log
-import kotlin.compareTo
-import kotlin.dec
-import kotlin.rem
+import com.example.uqac_progmob_project.BaseActivity
+import com.example.uqac_progmob_project.gameChoose.FinalResult
+import kotlinx.coroutines.delay
 
-class BombGames : ComponentActivity() {
+
+class BombGames : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -92,27 +94,52 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
     var currentPlayerIndex by remember { mutableIntStateOf((0 until playerNames.size).random()) } // Randomly select the first player
     var players by remember { mutableStateOf(playerNames.toMutableList()) }
     var eliminatedPlayer by remember { mutableStateOf<String?>(null) }
+    var playerScores by remember { mutableStateOf(IntArray(playerNames.size) { 0 }.toMutableList()) }
+    var eliminationOrder by remember { mutableIntStateOf(playerNames.size - 1) }
+    var playerIndices by remember { mutableStateOf((playerNames.indices).toMutableList()) }
+
+    Log.d("BombGamesScreen", "gameSessionName: $gameSessionName")
+    Log.d("BombGamesScreen", "playerNames: $playerNames")
+    Log.d("BombGamesScreen", "isPermissionGranted: $isPermissionGranted")
+    Log.d("BombGamesScreen", "showPermissionRationale: $showPermissionRationale")
+    Log.d("BombGamesScreen", "timerValue: $timerValue")
+    Log.d("BombGamesScreen", "gameStarted: $gameStarted")
+    Log.d("BombGamesScreen", "countdownValue: $countdownValue")
+    Log.d("BombGamesScreen", "currentPlayerIndex: $currentPlayerIndex")
+    Log.d("BombGamesScreen", "players: $players")
+    Log.d("BombGamesScreen", "eliminatedPlayer: $eliminatedPlayer")
+    Log.d("BombGamesScreen", "playerScores: $playerScores")
+    Log.d("BombGamesScreen", "eliminationOrder: $eliminationOrder")
+    Log.d("BombGamesScreen", "playerIndices: $playerIndices")
 
     val permissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             isPermissionGranted = isGranted
+            Log.d("BombGamesScreen", "Permission granted: $isGranted")
         }
 
     // Function to deduct time
     fun deductTime() {
         val deduction = (5..10).random()
         timerValue = (timerValue - deduction).coerceAtLeast(0)
+        Log.d("BombGamesScreen", "Time deducted: $deduction, new timerValue: $timerValue")
     }
 
     // Function to eliminate the current player
     fun eliminateCurrentPlayer() {
-        eliminatedPlayer = players[currentPlayerIndex]
-        players.removeAt(currentPlayerIndex)
-        if (players.size > 1) {
-            currentPlayerIndex = (0 until players.size).random()
-            timerValue = (30..60).random()
-            countdownValue = 10
-            gameStarted = false
+        if (currentPlayerIndex < players.size && currentPlayerIndex < playerIndices.size) {
+            eliminatedPlayer = players[currentPlayerIndex]
+            playerScores[playerIndices[currentPlayerIndex]] = eliminationOrder--
+            players.removeAt(currentPlayerIndex)
+            playerIndices.removeAt(currentPlayerIndex)
+            Log.d("BombGamesScreen", "Player eliminated: $eliminatedPlayer, new playerScores: $playerScores, new eliminationOrder: $eliminationOrder")
+            if (players.size > 1) {
+                currentPlayerIndex = (0 until players.size).random()
+                timerValue = (30..60).random()
+                countdownValue = 10
+                gameStarted = false
+                Log.d("BombGamesScreen", "New currentPlayerIndex: $currentPlayerIndex, new timerValue: $timerValue, new countdownValue: $countdownValue, gameStarted: $gameStarted")
+            }
         }
     }
 
@@ -120,8 +147,9 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
     LaunchedEffect(gameStarted) {
         if (gameStarted) {
             while (timerValue > 0) {
-                kotlinx.coroutines.delay(1000L)
+                delay(1000L)
                 timerValue--
+                Log.d("BombGamesScreen", "Timer ticking, timerValue: $timerValue")
             }
             eliminateCurrentPlayer()
         }
@@ -130,16 +158,19 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
     // Countdown logic
     LaunchedEffect(countdownValue) {
         if (countdownValue > 0) {
-            kotlinx.coroutines.delay(1000L)
+            delay(1000L)
             countdownValue--
+            Log.d("BombGamesScreen", "Countdown ticking, countdownValue: $countdownValue")
         } else {
             gameStarted = true
+            Log.d("BombGamesScreen", "Game started")
         }
     }
 
     // Vérification initiale de la permission
     LaunchedEffect(Unit) {
         isPermissionGranted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        Log.d("BombGamesScreen", "Initial permission check, isPermissionGranted: $isPermissionGranted")
     }
 
     // Si la permission est refusée, on affiche une boîte de dialogue explicative
@@ -167,14 +198,8 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
     // UI du jeu si la permission est accordée
     if (isPermissionGranted) {
         if (players.size == 1) {
-            // Display the winner
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text("Le gagnant est : ${players[0]}", fontSize = 24.sp)
-            }
+            playerScores[playerIndices[currentPlayerIndex]] = eliminationOrder
+            EndGame(gameSessionName, playerNames, playerScores)
         } else if (!gameStarted) {
             // Display the starting player and countdown
             Column(
@@ -193,6 +218,7 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
         } else {
             GameUI(gameSessionName, players, timerValue, ::deductTime, currentPlayerIndex) {
                 currentPlayerIndex = (currentPlayerIndex + 1) % players.size
+                Log.d("BombGamesScreen", "Next player, currentPlayerIndex: $currentPlayerIndex")
             }
         }
     } else {
@@ -216,6 +242,19 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
     }
 }
 
+@SuppressLint("ComposableNaming")
+@Composable
+fun EndGame(gameSessionName: String, playerNames: List<String>, playerScores: List<Int>) {
+    val context = LocalContext.current
+    Log.d("BombGamesScreen", "Ending game, gameSessionName: $gameSessionName, playerNames: $playerNames, playerScores: $playerScores")
+    Log.d("BombGamesScreen", "Navigating to FinalResult screen")
+    val intent = Intent(context, FinalResult::class.java).apply {
+        putExtra("GAMESESSIONNAME", gameSessionName)
+        putStringArrayListExtra("PLAYER_NAMES", ArrayList(playerNames))
+        putIntegerArrayListExtra("PLAYER_SCORES", ArrayList(playerScores))
+    }
+    context.startActivity(intent)
+}
 
 @Composable
 fun GameUI(
@@ -375,7 +414,7 @@ fun AnimatedBomb(timerValue: Int) {
     val duration = ((timerValue / 60f) * (maxDuration - minDuration) + minDuration).toInt()
 
     // Log the duration value
-    Log.d("AnimatedBomb", "Animation duration: $duration ms")
+    //Log.d("AnimatedBomb", "Animation duration: $duration ms")
 
     val infiniteTransition = rememberInfiniteTransition()
     val scale by infiniteTransition.animateFloat(
@@ -412,7 +451,7 @@ fun ExplosionAnimation() {
 
     LaunchedEffect(Unit) {
         while (currentFrame < explosionImages.size - 1) {
-            kotlinx.coroutines.delay(200L) // Adjust the delay to control the animation speed
+            delay(200L) // Adjust the delay to control the animation speed
             currentFrame++
         }
     }
