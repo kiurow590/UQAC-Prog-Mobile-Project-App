@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.gms.google.services)
 }
 
 android {
@@ -40,6 +41,9 @@ android {
         dataBinding=true
 
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.9"
+    }
 }
 
 dependencies {
@@ -68,4 +72,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.constraintlayout.compose)
 
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth.ktx)
 }
