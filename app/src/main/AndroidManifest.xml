@@ -18,6 +18,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
         tools:targetApi="31">
+
+
+        <!-- Add this inside the application tag -->
+        <meta-data
+            android:name="com.google.android.gms.auth.api.signin.API_KEY"
+            android:value="@string/web_client_id" />
+
         <activity
             android:name=".mainActivity.MainActivity"
             android:exported="true">

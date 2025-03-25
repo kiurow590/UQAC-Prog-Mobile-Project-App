@@ -1,6 +1,8 @@
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -18,11 +20,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import com.example.uqac_progmob_project.R // Remplace par ton vrai package
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.uqac_progmob_project.gameChoose.GameChoose
+import com.example.uqac_progmob_project.mainActivity.signInWithGoogle
 import com.example.uqac_progmob_project.settings.SettingsDialog
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 /**
  * Composable function that defines the layout of the Main Screen
@@ -115,6 +124,44 @@ fun MainScreen() {
             onDismissRequest = { showDialog = false },
             onConfirm = { showDialog = false }
         )
+    }
+}
+
+@Composable
+fun SignInScreen(onSignInSuccess: () -> Unit) {
+    val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener { authResult ->
+                    if (authResult.isSuccessful) {
+                        onSignInSuccess()
+                    } else {
+                        Toast.makeText(context, "Connexion échouée", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: ApiException) {
+            Toast.makeText(context, "Erreur : ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Button(
+            onClick = { signInWithGoogle(context, launcher) }
+        ) {
+            Text("Se connecter avec Google")
+        }
     }
 }
 
