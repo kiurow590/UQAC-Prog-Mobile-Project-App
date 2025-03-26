@@ -5,31 +5,28 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
 import com.example.uqac_progmob_project.R
-import kotlin.random.Random
 
 class TriMannGame : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,78 +37,138 @@ class TriMannGame : BaseActivity() {
         Log.d("TriMannGame", "Session: $gameSessionName, Joueurs: $playerNames")
 
         setContent {
-            TrimannGameScreen(gameSessionName, playerNames)
+            TriMannGameScreen(gameSessionName, playerNames)
         }
     }
 }
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun TrimannGameScreen(gameSessionName : String, playerNames : List<String>) {
-    var dice1 by remember { mutableStateOf(1) }
-    var dice2 by remember { mutableStateOf(1) }
-    var resultMessage by remember { mutableStateOf("") }
-    fun checkRules(d1: Int, d2: Int) {
-        when {
-            d1 == 3 || d2 == 3 || d1 + d2 == 3 -> {
-                resultMessage = "Tu es le Tri-mann !"
+fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
+    val players = remember { playerNames.toMutableList() }
+    var currentPlayerIndex by remember { mutableStateOf(0) }
+    var diceResult by remember { mutableStateOf(0) }
+    var gameStarted by remember { mutableStateOf(false) }
+    var playerScores by remember { mutableStateOf(IntArray(players.size) { 0 }.toMutableList()) }
+    var gameEnded by remember { mutableStateOf(false) }
+
+    // Lancer des dés
+    fun rollDice(): Pair<Int, Int> {
+        return (1..6).random() to (1..6).random() // Générer deux nombres indépendants
+    }
+    // Règle du Tri Mann et actions spécifiques selon les dés
+    fun applyGameRules(dice1: Int, dice2: Int) {
+        // Si c'est un 3 ou une somme de 3, le joueur devient le Tri Mann
+        if (dice1 == 3 || dice2 == 3 || (dice1 + dice2 == 3)) {
+            // Le joueur courant devient le Tri Mann
+            Log.d("TriMannGame", "${players[currentPlayerIndex]} devient le Tri Mann !")
+        }
+
+        // Vérifier si c'est un double impair (boire)
+        if (dice1 % 2 != 0 && dice2 % 2 != 0) {
+            Log.d("TriMannGame", "${players[currentPlayerIndex]} doit boire deux gorgées (double impair) !")
+        }
+
+        // Vérifier si c'est un double pair (distribuer)
+        if (dice1 % 2 == 0 && dice1 == dice2) {
+            Log.d("TriMannGame", "${players[currentPlayerIndex]} doit distribuer !")
+        }
+
+        // Vérifier si un 6 est lancé, et gérer la règle des gorgées
+        if (dice1 == 6 || dice2 == 6) {
+            if (dice1 == 6 && dice2 == 6) {
+                Log.d("TriMannGame", "Deux 6 lancés, chifoumi entre deux joueurs !")
+                // Implémenter un "chifoumi" ici
+            } else {
+                val total = if (dice1 == 6) dice2 else dice1
+                Log.d("TriMannGame", "Posez $total gorgées sur la table")
             }
-            d1 % 2 != 0 && d2 % 2 != 0 -> {
-                resultMessage = "Double impair ! Tu bois !"
-            }
-            d1 % 2 == 0 && d2 % 2 == 0 -> {
-                resultMessage = "Double pair ! Tu distribues !"
-            }
-            d1 == 6 || d2 == 6 -> {
-                if (d1 == 6 && d2 == 6) {
-                    resultMessage = "Deux 6 ! Désigne deux personnes pour un Chifoumi !"
-                } else {
-                    resultMessage = "Un 6, mets le nombre correspondant sur la table."
-                }
-            }
-            else -> {
-                resultMessage = "Lance encore les dés !"
+        }
+
+        // Règle du 7 et du 9 : affecte le joueur précédent ou suivant
+        if (dice1 == 7 || dice2 == 7) {
+            val previousPlayerIndex = (currentPlayerIndex - 1 + players.size) % players.size
+            Log.d("TriMannGame", "${players[currentPlayerIndex]} passe au joueur précédent ${players[previousPlayerIndex]}")
+        } else if (dice1 == 9 || dice2 == 9) {
+            val nextPlayerIndex = (currentPlayerIndex + 1) % players.size
+            Log.d("TriMannGame", "${players[currentPlayerIndex]} passe au joueur suivant ${players[nextPlayerIndex]}")
+        }
+
+        // Appliquer la règle des gorgées pour chaque lancer de dés
+        if (dice1 != dice2) {
+            Log.d("TriMannGame", "${players[currentPlayerIndex]} doit boire 2 gorgées")
+        }
+    }
+
+    // Mise à jour de l'updateScore pour appliquer les règles
+    fun updateScore() {
+        val (dice1, dice2) = rollDice() // Obtenir les résultats des deux dés
+        diceResult = dice1 + dice2 // Calculer le total des dés
+        playerScores[currentPlayerIndex] += diceResult
+
+        // Appliquer les règles du jeu après chaque lancer de dés
+        applyGameRules(dice1, dice2)
+
+        Log.d("TriMannGame", "Joueur ${players[currentPlayerIndex]} a lancé un $dice1 et un $dice2, total = $diceResult")
+    }
+
+    // Changer de joueur
+    fun nextPlayer() {
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size
+    }
+
+    // Affichage des résultats
+    LaunchedEffect(gameStarted) {
+        if (gameStarted && !gameEnded) {
+            updateScore()
+            if (players.size == 1) {
+                gameEnded = true
+            } else {
+                nextPlayer()
             }
         }
     }
-    // Fonction pour gérer le lancer des dés
-    fun rollDice() {
-        dice1 = Random.nextInt(1, 7)
-        dice2 = Random.nextInt(1, 7)
-        checkRules(dice1, dice2)
-    }
-
-    // Vérification des règles en fonction des dés
-
 
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Tri-mann Game", fontSize = 32.sp, color = Color.Black)
-
+        Text(text = "Session de Jeu: $gameSessionName", fontSize = 24.sp)
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Affichage des dés
-        Row {
-            DiceImage(dice1)
-            Spacer(modifier = Modifier.width(16.dp))
-            DiceImage(dice2)
+        if (gameStarted) {
+            Text(text = "Tour de ${players[currentPlayerIndex]}", fontSize = 20.sp)
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(onClick = { updateScore() }) {
+                Text(text = "Lancer les dés")
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Affichage des résultats des deux dés
+            Text(text = "Résultats des dés: $diceResult", fontSize = 18.sp)
+            Text(text = "Dé 1: ${diceResult / 2}, Dé 2: ${diceResult / 2}", fontSize = 16.sp) // Optionally split the result
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Affichage des scores
+            playerScores.forEachIndexed { index, score ->
+                Text(text = "${players[index]} : $score", fontSize = 16.sp)
+            }
+        } else {
+            Button(onClick = { gameStarted = true }) {
+                Text(text = "Démarrer le jeu")
+            }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Affichage du message de résultat
-        Text(text = resultMessage, fontSize = 24.sp, color = Color.Black)
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Bouton pour relancer les dés
-        Button(onClick = { rollDice() }) {
-            Text(text = "Relancer les dés")
+        if (gameEnded) {
+            Text(text = "Le jeu est terminé !", fontSize = 24.sp)
+            val winner = players[playerScores.indexOf(playerScores.maxOrNull()!!)]
+            Text(text = "Le gagnant est : $winner", fontSize = 20.sp)
         }
     }
+
 }
+
 
 // Composant pour afficher l'image d'un dé
 @Composable
@@ -136,7 +193,7 @@ fun DiceImage(diceNumber: Int) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewTrimannGameScreen() {
-    TrimannGameScreen(
+    TriMannGameScreen(
         gameSessionName = "Partie Test",
         playerNames = listOf("Alice", "Bob", "Charlie")
     )

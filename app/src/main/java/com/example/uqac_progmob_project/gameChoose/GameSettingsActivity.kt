@@ -65,7 +65,6 @@ class GameSettingsActivity : BaseActivity() {
                                 putExtra("GAMESESSIONNAME", finalGameSessionName)
                             }
                             startActivity(intent)
-                            Toast.makeText(this, "Starting Tri Mann", Toast.LENGTH_SHORT).show()
                         }
                         getString(R.string.bleiz_garou) -> {
                             Toast.makeText(this, "Starting Bomber Game", Toast.LENGTH_SHORT).show()
