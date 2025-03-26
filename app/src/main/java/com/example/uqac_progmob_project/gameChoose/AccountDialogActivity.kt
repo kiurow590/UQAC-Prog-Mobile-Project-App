@@ -14,8 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import coil.compose.rememberAsyncImagePainter
 import com.example.uqac_progmob_project.R
-import coil.compose.rememberImagePainter
 
 import com.google.firebase.auth.FirebaseAuth
 
@@ -54,7 +54,7 @@ fun AccountDialog(
             Column {
                 if (userProfilePicture != null) {
                     Image(
-                        painter = rememberImagePainter(userProfilePicture),
+                        painter = rememberAsyncImagePainter(userProfilePicture),
                         contentDescription = "Account Picture",
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
@@ -67,7 +67,6 @@ fun AccountDialog(
                 }
                 Text("User Name: $userName")
                 Text("Email: $userEmail")
-                Text("Score Global: 100")
             }
         },
         confirmButton = {

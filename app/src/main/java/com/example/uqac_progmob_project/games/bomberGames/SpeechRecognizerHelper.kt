@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
-import android.util.Log
 
 class SpeechRecognizerHelper(
     private val context: Context,
@@ -54,6 +53,7 @@ class SpeechRecognizerHelper(
     }
 
     fun destroy() {
+        speechRecognizer?.stopListening()
         speechRecognizer?.destroy()
     }
 }

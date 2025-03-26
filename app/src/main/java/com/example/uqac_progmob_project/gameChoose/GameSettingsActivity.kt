@@ -3,7 +3,6 @@ package com.example.uqac_progmob_project.gameChoose
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -75,15 +74,13 @@ class GameSettingsActivity : BaseActivity() {
         onPlayClick: (String, List<String>) -> Unit
     ) {
         var gameSessionName by remember { mutableStateOf("") }
-        var numberOfPlayers by remember { mutableStateOf(2) }
+        var numberOfPlayers by remember { mutableIntStateOf(2) }
         val playerNames = remember { mutableStateListOf("", "") }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            //verticalArrangement = Arrangement.Center,
-            //horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row {
                 IconButton(onClick = onBackClick) {

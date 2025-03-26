@@ -1,14 +1,13 @@
 package com.example.uqac_progmob_project.gameHistory
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -48,6 +47,9 @@ class GameHistoryActivity : BaseActivity() {
     }
 }
 
+/**
+ * Récupère l'historique des parties d'un utilisateur
+ */
 fun fetchUserGameHistory(userId: String, onResult: (List<GameHistoryItem>) -> Unit) {
     if (userId.isEmpty()) return
 
@@ -58,12 +60,13 @@ fun fetchUserGameHistory(userId: String, onResult: (List<GameHistoryItem>) -> Un
         .addOnSuccessListener { documents ->
             val historyList = documents.map { document ->
                 val gameSessionName = document.getString("gameSessionName") ?: "Partie"
-                val results = document.get("results") as List<Map<String, Any>>
+                val results = document.get("results") as List<*>
 
                 val playerScores = results.map {
+                    val score = (it as Map<*, *>)["score"]
                     PlayerScore(
                         playerName = it["name"] as String,
-                        score = (it["score"] as Long).toInt()
+                        score = (score as? Long)?.toInt() ?: 0
                     )
                 }
                 GameHistoryItem(gameSessionName, document.id, playerScores)
@@ -75,12 +78,11 @@ fun fetchUserGameHistory(userId: String, onResult: (List<GameHistoryItem>) -> Un
         }
 }
 
-
 @Composable
 fun GameHistoryScreen(historyData: List<GameHistoryItem>, onBackClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         IconButton(onClick = onBackClick) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text(

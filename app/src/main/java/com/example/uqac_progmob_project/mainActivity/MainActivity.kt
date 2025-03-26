@@ -1,7 +1,5 @@
 package com.example.uqac_progmob_project.mainActivity
 
-import MainScreen
-import SignInScreen
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
