@@ -64,7 +64,7 @@ import kotlinx.coroutines.delay
 class BombGames : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        supportActionBar?.hide()
         val gameSessionName = intent.getStringExtra("GAMESESSIONNAME") ?: ""
         val playerNames = intent.getStringArrayListExtra("PLAYERSESSIONNAME") ?: listOf()
 
@@ -197,7 +197,11 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
     // UI du jeu si la permission est accordée
     if (isPermissionGranted) {
         if (players.size == 1) {
-            playerScores[playerIndices[currentPlayerIndex]] = eliminationOrder
+            Log.d("BombGamesScreen", "Game ended, playerScores: $playerIndices")
+            Log.d("BombGamesScreen", "currentPlayerIndex: $currentPlayerIndex")
+            Log.d("BombGamesScreen", "players: $eliminationOrder")
+            Log.d("BombGamesScreen", "$playerScores")
+            playerScores[playerIndices[0]] = eliminationOrder
             EndGame(gameSessionName, playerNames, playerScores)
         } else if (!gameStarted) {
             // Display the starting player and countdown
@@ -253,6 +257,7 @@ fun EndGame(gameSessionName: String, playerNames: List<String>, playerScores: Li
         putIntegerArrayListExtra("PLAYER_SCORES", ArrayList(playerScores))
     }
     context.startActivity(intent)
+    (context as Activity).finish()
 }
 
 @Composable

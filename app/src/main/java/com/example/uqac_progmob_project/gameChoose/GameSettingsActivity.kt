@@ -1,5 +1,6 @@
 package com.example.uqac_progmob_project.gameChoose
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
 import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.games.bomberGames.BombGames
+import kotlin.or
 
 class GameSettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,9 +57,9 @@ class GameSettingsActivity : BaseActivity() {
                             val intent = Intent(this, BombGames::class.java).apply {
                                 putExtra("PLAYERSESSIONNAME", ArrayList(finalPlayerNames))
                                 putExtra("GAMESESSIONNAME", finalGameSessionName)
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                             }
                             startActivity(intent)
+                            finish()
                         }
                         else -> {
                             Toast.makeText(this, "Unknown Game: $gameName", Toast.LENGTH_SHORT).show()
