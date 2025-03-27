@@ -253,6 +253,7 @@ fun EndGame(gameSessionName: String, playerNames: List<String>, playerScores: Li
     Log.d("BombGamesScreen", "Navigating to FinalResult screen")
     val intent = Intent(context, FinalResult::class.java).apply {
         putExtra("GAMESESSIONNAME", gameSessionName)
+        putExtra("GAMETYPE", "Et Boom")
         putStringArrayListExtra("PLAYER_NAMES", ArrayList(playerNames))
         putIntegerArrayListExtra("PLAYER_SCORES", ArrayList(playerScores))
     }

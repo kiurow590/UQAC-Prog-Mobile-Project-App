@@ -28,13 +28,15 @@ class FinalResult : BaseActivity() {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         val gameSessionName = intent.getStringExtra("GAMESESSIONNAME") ?: "Partie"
+        val gameType = intent.getStringExtra("GAMETYPE") ?: "Unknown"
+        Log.d("FinalResult", "Game Type: $gameType")
         val playerNames = intent.getStringArrayListExtra("PLAYER_NAMES") ?: listOf()
         val playerScores = intent.getIntegerArrayListExtra("PLAYER_SCORES") ?: listOf()
 
         val players = playerNames.zip(playerScores) { name, score -> PlayerResult(name, score) }
 
         // Save results to Firestore
-        saveResultsToFirestore(gameSessionName, players)
+        saveResultsToFirestore(gameSessionName, players, gameType)
 
         setContent {
             FinalResultScreen(gameSessionName, players, this)
@@ -42,14 +44,13 @@ class FinalResult : BaseActivity() {
     }
 }
 
-
 // Modèle de données pour stocker les résultats des joueurs
 data class PlayerResult(val name: String, val score: Int)
 
 
-fun saveResultsToFirestore(gameSessionName: String, players: List<PlayerResult>) {
+fun saveResultsToFirestore(gameSessionName: String, players: List<PlayerResult>, gameType: String) {
     val user = FirebaseAuth.getInstance().currentUser
-    val userId = user?.uid ?: return // Si l'utilisateur n'est pas connecté, on ne fait rien
+    val userId = user?.uid ?: return // If the user is not logged in, do nothing
 
     val db = FirebaseFirestore.getInstance()
     val sessionRef = db.collection("game_sessions").document(userId).collection("sessions").document(gameSessionName)
@@ -60,19 +61,19 @@ fun saveResultsToFirestore(gameSessionName: String, players: List<PlayerResult>)
 
     val data = hashMapOf(
         "gameSessionName" to gameSessionName,
+        "gameType" to gameType,
         "results" to results,
         "timestamp" to FieldValue.serverTimestamp()
     )
 
     sessionRef.set(data)
         .addOnSuccessListener {
-            Log.d("Firestore", "Résultats enregistrés avec succès")
+            Log.d("Firestore", "Results successfully saved")
         }
         .addOnFailureListener { e ->
-            Log.e("Firestore", "Erreur lors de l'enregistrement", e)
+            Log.e("Firestore", "Error saving results", e)
         }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinalResultScreen(gameSessionName: String, players: List<PlayerResult>, activity: ComponentActivity) {

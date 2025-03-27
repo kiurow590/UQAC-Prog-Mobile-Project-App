@@ -60,6 +60,7 @@ fun fetchUserGameHistory(userId: String, onResult: (List<GameHistoryItem>) -> Un
         .addOnSuccessListener { documents ->
             val historyList = documents.map { document ->
                 val gameSessionName = document.getString("gameSessionName") ?: "Partie"
+                val category = document.getString("gameType") ?: "Unknown"
                 val results = document.get("results") as List<*>
 
                 val playerScores = results.map {
@@ -69,7 +70,7 @@ fun fetchUserGameHistory(userId: String, onResult: (List<GameHistoryItem>) -> Un
                         score = (score as? Long)?.toInt() ?: 0
                     )
                 }
-                GameHistoryItem(gameSessionName, document.id, playerScores)
+                GameHistoryItem(gameSessionName, document.id, playerScores, category)
             }
             onResult(historyList)
         }
@@ -80,6 +81,8 @@ fun fetchUserGameHistory(userId: String, onResult: (List<GameHistoryItem>) -> Un
 
 @Composable
 fun GameHistoryScreen(historyData: List<GameHistoryItem>, onBackClick: () -> Unit) {
+    val groupedHistory = historyData.groupBy { it.category }
+
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         IconButton(onClick = onBackClick) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -92,8 +95,30 @@ fun GameHistoryScreen(historyData: List<GameHistoryItem>, onBackClick: () -> Uni
         )
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn {
-            items(historyData.size) { index ->
-                GameHistoryItemView(historyData[index])
+            groupedHistory.forEach { (category, items) ->
+                item {
+                    CategoryItemView(category, items)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CategoryItemView(category: String, items: List<GameHistoryItem>) {
+    var expanded by remember { mutableStateOf(false) }
+    Column(modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded }) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = category, fontSize = 22.sp)
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = if (expanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = if (expanded) "Collapse" else "Expand"
+            )
+        }
+        if (expanded) {
+            items.forEach { gameHistoryItem ->
+                GameHistoryItemView(gameHistoryItem)
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
@@ -140,5 +165,6 @@ fun GameHistoryItemView(gameHistoryItem: GameHistoryItem) {
 }
 
 
-data class GameHistoryItem(val gameName: String, val sessionName: String, val playerScores: List<PlayerScore>)
+data class GameHistoryItem(val gameName: String, val sessionName: String, val playerScores: List<PlayerScore>, val category: String)
 data class PlayerScore(val playerName: String, val score: Int)
+
