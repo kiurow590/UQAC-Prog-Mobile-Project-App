@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,7 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 class FinalResult : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        supportActionBar?.hide()
         val gameSessionName = intent.getStringExtra("GAMESESSIONNAME") ?: "Partie"
         val playerNames = intent.getStringArrayListExtra("PLAYER_NAMES") ?: listOf()
         val playerScores = intent.getIntegerArrayListExtra("PLAYER_SCORES") ?: listOf()
@@ -71,7 +73,6 @@ fun saveResultsToFirestore(gameSessionName: String, players: List<PlayerResult>)
         }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinalResultScreen(gameSessionName: String, players: List<PlayerResult>, activity: ComponentActivity) {
@@ -86,6 +87,11 @@ fun FinalResultScreen(gameSessionName: String, players: List<PlayerResult>, acti
     ) {
         TopAppBar(
             title = { Text(text = "Résultat - $gameSessionName") },
+            navigationIcon = {
+                IconButton(onClick = { activity.finish() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+            },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.White,
                 titleContentColor = Color.Black

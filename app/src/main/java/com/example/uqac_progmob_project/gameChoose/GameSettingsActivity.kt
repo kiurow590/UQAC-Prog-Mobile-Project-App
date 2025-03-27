@@ -55,6 +55,7 @@ class GameSettingsActivity : BaseActivity() {
                             val intent = Intent(this, BombGames::class.java).apply {
                                 putExtra("PLAYERSESSIONNAME", ArrayList(finalPlayerNames))
                                 putExtra("GAMESESSIONNAME", finalGameSessionName)
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                             }
                             startActivity(intent)
                         }

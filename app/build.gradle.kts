@@ -84,6 +84,8 @@ dependencies {
 
     implementation(libs.firebase.firestore.ktx)
 
-
+    implementation (libs.firebase.auth)
+    implementation (libs.androidx.credentials)
+    implementation (libs.firebase.auth)
 
 }
