@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,25 +19,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 
 class FinalResult : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        supportActionBar?.hide()
         val gameSessionName = intent.getStringExtra("GAMESESSIONNAME") ?: "Partie"
+        val gameType = intent.getStringExtra("GAMETYPE") ?: "Unknown"
+        Log.d("FinalResult", "Game Type: $gameType")
         val playerNames = intent.getStringArrayListExtra("PLAYER_NAMES") ?: listOf()
         val playerScores = intent.getIntegerArrayListExtra("PLAYER_SCORES") ?: listOf()
 
-        // Log the incoming values
-        Log.d("FinalResult", "gameSessionName: $gameSessionName")
-        Log.d("FinalResult", "playerNames: $playerNames")
-        Log.d("FinalResult", "playerScores: $playerScores")
-
-        // Associate names and scores into a list of objects
         val players = playerNames.zip(playerScores) { name, score -> PlayerResult(name, score) }
 
+        // Save results to Firestore
+        saveResultsToFirestore(gameSessionName, players, gameType)
+
         setContent {
-            FinalResultScreen(gameSessionName, players)
+            FinalResultScreen(gameSessionName, players, this)
         }
     }
 }
@@ -43,10 +47,37 @@ class FinalResult : BaseActivity() {
 // Modèle de données pour stocker les résultats des joueurs
 data class PlayerResult(val name: String, val score: Int)
 
+
+fun saveResultsToFirestore(gameSessionName: String, players: List<PlayerResult>, gameType: String) {
+    val user = FirebaseAuth.getInstance().currentUser
+    val userId = user?.uid ?: return // If the user is not logged in, do nothing
+
+    val db = FirebaseFirestore.getInstance()
+    val sessionRef = db.collection("game_sessions").document(userId).collection("sessions").document(gameSessionName)
+
+    val results = players.map { player ->
+        mapOf("name" to player.name, "score" to player.score)
+    }
+
+    val data = hashMapOf(
+        "gameSessionName" to gameSessionName,
+        "gameType" to gameType,
+        "results" to results,
+        "timestamp" to FieldValue.serverTimestamp()
+    )
+
+    sessionRef.set(data)
+        .addOnSuccessListener {
+            Log.d("Firestore", "Results successfully saved")
+        }
+        .addOnFailureListener { e ->
+            Log.e("Firestore", "Error saving results", e)
+        }
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FinalResultScreen(gameSessionName: String, players: List<PlayerResult>) {
-    // Trier les joueurs par score décroissant
+fun FinalResultScreen(gameSessionName: String, players: List<PlayerResult>, activity: ComponentActivity) {
+    // Sort players by descending score
     val sortedPlayers = players.sortedByDescending { it.score }
 
     Column(
@@ -57,6 +88,11 @@ fun FinalResultScreen(gameSessionName: String, players: List<PlayerResult>) {
     ) {
         TopAppBar(
             title = { Text(text = "Résultat - $gameSessionName") },
+            navigationIcon = {
+                IconButton(onClick = { activity.finish() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+            },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.White,
                 titleContentColor = Color.Black
@@ -65,7 +101,7 @@ fun FinalResultScreen(gameSessionName: String, players: List<PlayerResult>) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Affichage des résultats sous forme de tableau
+        // Display results in a table
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -77,8 +113,14 @@ fun FinalResultScreen(gameSessionName: String, players: List<PlayerResult>) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { /* TODO: Ajouter la navigation vers le menu principal */ }) {
+        Button(onClick = { /* TODO: Add navigation to the main menu */ }) {
             Text("Retour au menu")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { activity.finish() }) {
+            Text("Quitter l'application")
         }
     }
 }
@@ -107,5 +149,8 @@ fun PreviewFinalResultScreen() {
         PlayerResult("Bob", 10),
         PlayerResult("Charlie", 8)
     )
-    FinalResultScreen(gameSessionName = "Partie Test", players = samplePlayers)
+    FinalResultScreen(
+        gameSessionName = "Partie Test", players = samplePlayers,
+        activity = ComponentActivity()
+    )
 }

@@ -1,9 +1,9 @@
 package com.example.uqac_progmob_project.gameChoose
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
 import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.games.bomberGames.BombGames
+import kotlin.or
 
 class GameSettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +59,7 @@ class GameSettingsActivity : BaseActivity() {
                                 putExtra("GAMESESSIONNAME", finalGameSessionName)
                             }
                             startActivity(intent)
+                            finish()
                         }
                         else -> {
                             Toast.makeText(this, "Unknown Game: $gameName", Toast.LENGTH_SHORT).show()
@@ -75,15 +77,13 @@ class GameSettingsActivity : BaseActivity() {
         onPlayClick: (String, List<String>) -> Unit
     ) {
         var gameSessionName by remember { mutableStateOf("") }
-        var numberOfPlayers by remember { mutableStateOf(2) }
+        var numberOfPlayers by remember { mutableIntStateOf(2) }
         val playerNames = remember { mutableStateListOf("", "") }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            //verticalArrangement = Arrangement.Center,
-            //horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row {
                 IconButton(onClick = onBackClick) {
