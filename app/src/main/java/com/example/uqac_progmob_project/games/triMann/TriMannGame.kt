@@ -12,14 +12,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -27,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,58 +77,74 @@ fun DiceImage(diceNumber: Int, rotation: Float) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
     val players = remember { playerNames.toMutableList() }
-    var currentPlayerIndex by remember { mutableStateOf(0) }
-    var dice1Result by remember { mutableStateOf(0) }
-    var dice2Result by remember { mutableStateOf(0) }
-    var gameStarted by remember { mutableStateOf(false) }
-    var rotation1 by remember { mutableStateOf(0f) }
-    var rotation2 by remember { mutableStateOf(0f) }
-    var playerScores by remember { mutableStateOf(IntArray(players.size) { 0 }.toMutableList()) }
-    var gameEnded by remember { mutableStateOf(false) }
-    var roundEnded by remember { mutableStateOf(false) }
 
+    var currentPlayerIndex: Int by remember { mutableIntStateOf(0) }
+    var dice1Result: Int by remember { mutableIntStateOf(0) }
+    var dice2Result: Int by remember { mutableIntStateOf(0) }
+    var gameStarted: Boolean by remember { mutableStateOf(false) }
+    var rotation1: Float by remember { mutableFloatStateOf(0f) }
+    var rotation2: Float by remember { mutableFloatStateOf(0f) }
+    var playerScores: MutableList<Int> by remember { mutableStateOf(IntArray(players.size) { 0 }.toMutableList()) }
+    var gameEnded: Boolean by remember { mutableStateOf(false) }
+    var roundEnded: Boolean by remember { mutableStateOf(false) }
+    var trimanPlayerIndex: Int by remember { mutableIntStateOf((0..<players.size).random()) }
+    var givenPoints: MutableList<Int> by remember { mutableStateOf(IntArray(players.size){0}.toMutableList()) }
+    var showDistributionDialog by remember { mutableStateOf(false) }
+    // Fonction pour changer de joueur
+    fun nextPlayer() {
+        if (currentPlayerIndex==(players.size)-1){
+            trimanPlayerIndex = (0..<players.size).random();
+        }
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size
+
+    }
     // Fonction pour appliquer les règles et déterminer si le tour continue ou s'il est terminé
     fun applyGameRules(dice1: Int, dice2: Int): Boolean {
+
         var didPlayerDrink = false  // Variable pour suivre si le joueur doit boire
         var continueRound = true    // Variable pour déterminer si le tour continue
 
-        // Vérifier si c'est un double
-        if (dice1 == dice2) {
-            Log.d("TriMannGame", "${players[currentPlayerIndex]} a lancé un double!")
+        // Vérifier si c'est un double pair
+        if (dice1 == dice2 && dice1%2==0) {
+            Log.d("TriMannGame", "${players[currentPlayerIndex]} a lancé un double pair, il distribue alors ${dice1Result} points!")
+            //Ajouter component pour le choix de la distribution des points
+            playerScores[currentPlayerIndex] +=dice1Result;
         }
 
-        // Si c'est un 3 ou une somme de 3, le joueur devient le Tri Mann
+        // Si c'est un 3 ou une somme de 3, le trimann gagne 2 points
         if (dice1 == 3 || dice2 == 3 || (dice1 + dice2 == 3)) {
-            Log.d("TriMannGame", "${players[currentPlayerIndex]} devient le Tri Mann !")
+            Log.d("TriMannGame", "${players[trimanPlayerIndex]} gagne 2 points ")
+            playerScores[trimanPlayerIndex] +=2;
         }
 
         // Vérifier si c'est un 7 ou un 9 (changer de joueur)
         if (dice1 == 7 || dice2 == 7 || (dice1 + dice2 == 7)) {
             val previousPlayerIndex = (currentPlayerIndex - 1 + players.size) % players.size
-            Log.d("TriMannGame", "${players[currentPlayerIndex]} passe au joueur précédent ${players[previousPlayerIndex]}")
-            currentPlayerIndex = previousPlayerIndex // Changer de joueur
+            playerScores[previousPlayerIndex]+=2;
+            Log.d("TriMannGame", "${players[previousPlayerIndex]} gagne 2 points")
+
             continueRound = false  // Fin du tour, passage au joueur suivant
         } else if (dice1 == 9 || dice2 == 9 || (dice1 + dice2 == 9)) {
             val nextPlayerIndex = (currentPlayerIndex + 1) % players.size
-            Log.d("TriMannGame", "${players[currentPlayerIndex]} passe au joueur suivant ${players[nextPlayerIndex]}")
-            currentPlayerIndex = nextPlayerIndex // Changer de joueur
+            playerScores[nextPlayerIndex]+=2;
+            Log.d("TriMannGame", "${players[currentPlayerIndex]} gagne 2 points ")
+
             continueRound = false  // Fin du tour, passage au joueur suivant
         }
 
         // Vérifier si le joueur doit boire (double impair ou autre condition)
-        if (dice1 % 2 != 0 && dice2 % 2 != 0) {
+        if (dice1==dice2 && dice1 % 2 != 0) {
             Log.d("TriMannGame", "${players[currentPlayerIndex]} doit boire deux gorgées (double impair) !")
             didPlayerDrink = true
+            playerScores[currentPlayerIndex] +=dice1;
         }
 
-        // Vérifier si c'est un double pair (distribuer)
-        if (dice1 % 2 == 0 && dice1 == dice2) {
-            Log.d("TriMannGame", "${players[currentPlayerIndex]} doit distribuer !")
-        }
+
 
         // Vérifier si un 6 est lancé
         if (dice1 == 6 || dice2 == 6) {
@@ -132,7 +154,7 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
                 // Implémenter un "chifoumi" ici
             } else {
                 val total = if (dice1 == 6) dice2 else dice1
-                Log.d("TriMannGame", "Posez $total gorgées sur la table")
+                Log.d("TriMannGame", "Posez $total doigts sur la table")
                 didPlayerDrink = true
             }
         }
@@ -140,6 +162,7 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
         // Si le joueur n'a pas lancé un double, un 3, une somme de 3, un 7 ou un 9, le tour se termine
         if (!didPlayerDrink && dice1 != dice2 && (dice1 + dice2 != 3) && (dice1 != 7 && dice2 != 7) && (dice1 != 9 && dice2 != 9)) {
             Log.d("TriMannGame", "Le tour de ${players[currentPlayerIndex]} est terminé, aucun effet de boire.")
+            nextPlayer();
             continueRound = false
         }
 
@@ -158,9 +181,56 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
         roundEnded = !applyGameRules(dice1, dice2)
     }
 
-    // Fonction pour changer de joueur
-    fun nextPlayer() {
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.size
+
+    @Composable
+    fun DistributionPopup(
+        players: List<String>,
+        currentPlayerIndex: Int,
+        playerScores: MutableList<Int>,
+        onDismiss: () -> Unit,
+        onConfirm: () -> Unit
+    ) {
+        var givenPoints by remember { mutableStateOf(mutableMapOf<Int, Int>()) }
+
+        ModalBottomSheet(
+            onDismissRequest = { onDismiss() }
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text("Distribuez les gorgées", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(10.dp))
+
+                players.forEachIndexed { index, player ->
+                    if (index != currentPlayerIndex) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth().padding(8.dp)
+                        ) {
+                            Text(text = player, fontSize = 18.sp)
+                            Text(text = "${givenPoints[index] ?: 0} gorgées", fontSize = 16.sp)
+                            Button(onClick = {
+                                givenPoints[index] = (givenPoints[index] ?: 0) + 1
+                            }) {
+                                Text("+")
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+                Button(onClick = {
+                    givenPoints.forEach { (index, points) ->
+                        playerScores[index] += points
+                    }
+                    givenPoints.clear()
+                    onConfirm()
+                }) {
+                    Text("Valider")
+                }
+            }
+        }
     }
 
     Column(
@@ -212,6 +282,8 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
             val winner = players[playerScores.indexOf(playerScores.maxOrNull()!!)]
             Text(text = "Le gagnant est : $winner", fontSize = 20.sp)
         }
+
+        
     }
 }
 
