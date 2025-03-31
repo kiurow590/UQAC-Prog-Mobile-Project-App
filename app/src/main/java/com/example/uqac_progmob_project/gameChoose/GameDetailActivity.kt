@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
-import com.example.uqac_progmob_project.gameChoose.GameSettingsActivity
 
 class GameDetailActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,5 +1,6 @@
 package com.example.uqac_progmob_project.gameChoose
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -35,6 +36,7 @@ import com.example.uqac_progmob_project.BaseActivity
 import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.games.bomberGames.BombGames
 import com.example.uqac_progmob_project.games.triMann.TriMannGame
+
 
 class GameSettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +79,8 @@ class GameSettingsActivity : BaseActivity() {
                                 putExtra("PLAYERSESSIONNAME", ArrayList(finalPlayerNames))
                                 putExtra("GAMESESSIONNAME", finalGameSessionName)
                             }
+                            startActivity(intent)
+                            finish()
 
                         }
                         else -> {
@@ -95,15 +99,13 @@ class GameSettingsActivity : BaseActivity() {
         onPlayClick: (String, List<String>) -> Unit
     ) {
         var gameSessionName by remember { mutableStateOf("") }
-        var numberOfPlayers by remember { mutableStateOf(2) }
+        var numberOfPlayers by remember { mutableIntStateOf(2) }
         val playerNames = remember { mutableStateListOf("", "") }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            //verticalArrangement = Arrangement.Center,
-            //horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row {
                 IconButton(onClick = onBackClick) {

@@ -2,7 +2,6 @@ package com.example.uqac_progmob_project.games.bomberGames
 
 import android.app.Activity
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -65,7 +64,7 @@ import kotlinx.coroutines.delay
 class BombGames : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        supportActionBar?.hide()
         val gameSessionName = intent.getStringExtra("GAMESESSIONNAME") ?: ""
         val playerNames = intent.getStringArrayListExtra("PLAYERSESSIONNAME") ?: listOf()
 
@@ -138,7 +137,7 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
                 timerValue = (30..60).random()
                 countdownValue = 10
                 gameStarted = false
-                Log.d("BombGamesScreen", "New currentPlayerIndex: $currentPlayerIndex, new timerValue: $timerValue, new countdownValue: $countdownValue, gameStarted: $gameStarted")
+                Log.d("BombGamesScreen", "New currentPlayerIndex: $currentPlayerIndex, new timerValue: $timerValue, new countdownValue: $countdownValue")
             }
         }
     }
@@ -198,7 +197,11 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
     // UI du jeu si la permission est accordée
     if (isPermissionGranted) {
         if (players.size == 1) {
-            playerScores[playerIndices[currentPlayerIndex]] = eliminationOrder
+            Log.d("BombGamesScreen", "Game ended, playerScores: $playerIndices")
+            Log.d("BombGamesScreen", "currentPlayerIndex: $currentPlayerIndex")
+            Log.d("BombGamesScreen", "players: $eliminationOrder")
+            Log.d("BombGamesScreen", "$playerScores")
+            playerScores[playerIndices[0]] = eliminationOrder
             EndGame(gameSessionName, playerNames, playerScores)
         } else if (!gameStarted) {
             // Display the starting player and countdown
@@ -250,10 +253,12 @@ fun EndGame(gameSessionName: String, playerNames: List<String>, playerScores: Li
     Log.d("BombGamesScreen", "Navigating to FinalResult screen")
     val intent = Intent(context, FinalResult::class.java).apply {
         putExtra("GAMESESSIONNAME", gameSessionName)
+        putExtra("GAMETYPE", "Et Boom")
         putStringArrayListExtra("PLAYER_NAMES", ArrayList(playerNames))
         putIntegerArrayListExtra("PLAYER_SCORES", ArrayList(playerScores))
     }
     context.startActivity(intent)
+    (context as Activity).finish()
 }
 
 @Composable
@@ -374,38 +379,6 @@ fun TopBar(gameSessionName: String) {
     )
 }
 
-@Composable
-fun PlayerBubbles(playerNames: List<String>) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(playerNames.size) { index ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(50.dp)
-                            .background(Color.Gray, shape = CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.baseline_person_24), // Replace with your player icon resource
-                            contentDescription = "Player Icon",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = playerNames[index], color = Color.Black, fontSize = 12.sp)
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun AnimatedBomb(timerValue: Int) {
@@ -462,13 +435,6 @@ fun ExplosionAnimation() {
         modifier = Modifier.size(100.dp)
     )
 }
-
-@Composable
-fun RandomText() {
-    val randomChar = remember { ('A'..'Z').random() }
-    Text(text = "$randomChar...", fontSize = 24.sp)
-}
-
 
 @Preview(showBackground = true)
 @Composable
