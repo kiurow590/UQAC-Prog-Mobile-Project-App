@@ -1,28 +1,37 @@
+package com.example.uqac_progmob_project.mainActivity
+
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.example.uqac_progmob_project.R // Remplace par ton vrai package
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.gameChoose.GameChoose
 import com.example.uqac_progmob_project.settings.SettingsDialog
+
 
 /**
  * Composable function that defines the layout of the Main Screen
@@ -115,6 +124,22 @@ fun MainScreen() {
             onDismissRequest = { showDialog = false },
             onConfirm = { showDialog = false }
         )
+    }
+}
+
+@Composable
+fun SignInScreen(onSignInClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Button(
+            onClick = onSignInClick,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text("Se connecter avec Google")
+        }
     }
 }
 

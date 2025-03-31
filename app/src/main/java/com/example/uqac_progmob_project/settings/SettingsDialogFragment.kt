@@ -23,7 +23,7 @@ fun SettingsDialog(
 ) {
     val context = LocalContext.current
     var selectedLanguage by remember { mutableStateOf(getSavedLanguage(context)) }
-    var volumeLevel by remember { mutableStateOf(getSavedVolumeLevel(context)) }
+    var volumeLevel by remember { mutableIntStateOf(getSavedVolumeLevel(context)) }
     var expanded by remember { mutableStateOf(false) } // ✅ Gère l'ouverture du menu déroulant
 
     AlertDialog(
@@ -42,9 +42,7 @@ fun SettingsDialog(
                         value = selectedLanguage,
                         onValueChange = {},
                         readOnly = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(), // ✅ Assure un bon positionnement du menu
+                        modifier = Modifier.fillMaxWidth(), // Corrected modifier
                         label = { Text(text = stringResource(id = R.string.language)) },
                     )
                     DropdownMenu(

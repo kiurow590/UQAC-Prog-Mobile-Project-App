@@ -23,6 +23,8 @@ import com.example.uqac_progmob_project.R
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.google.firebase.auth.FirebaseAuth
+
 
 class GameChoose : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +32,7 @@ class GameChoose : AppCompatActivity() {
         supportActionBar?.hide()
         setContent {
             var showDialog by remember { mutableStateOf(false) }
+            val user = FirebaseAuth.getInstance().currentUser
 
             GameChooseScreen(
                 onBackClick = { finish() },
@@ -44,8 +47,11 @@ class GameChoose : AppCompatActivity() {
                 }
             )
 
-            if (showDialog) {
+            if (showDialog && user != null) {
                 AccountDialog(
+                    userName = user.displayName ?: "Unknown",
+                    userEmail = user.email ?: "Unknown",
+                    userProfilePicture = user.photoUrl?.toString(),
                     onDismissRequest = { showDialog = false },
                     onConfirmClick = { showDialog = false }
                 )
