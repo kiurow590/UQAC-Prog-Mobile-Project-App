@@ -1,6 +1,5 @@
 package com.example.uqac_progmob_project.gameChoose
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -99,7 +98,7 @@ class GameSettingsActivity : BaseActivity() {
         onPlayClick: (String, List<String>) -> Unit
     ) {
         var gameSessionName by remember { mutableStateOf("") }
-        var numberOfPlayers by remember { mutableIntStateOf(2) }
+        var numberOfPlayers by remember { mutableStateOf(2) }
         val playerNames = remember { mutableStateListOf("", "") }
 
         Column(
