@@ -67,6 +67,7 @@ class GameSettingsActivity : BaseActivity() {
                                 putExtra("GAMESESSIONNAME", finalGameSessionName)
                             }
                             startActivity(intent)
+                            finish()
                         }
                         getString(R.string.bleiz_garou) -> {
                             val intent = Intent(this, WerewolfGame::class.java).apply {
@@ -74,6 +75,7 @@ class GameSettingsActivity : BaseActivity() {
                                 putExtra("GAMESESSIONNAME", finalGameSessionName)
                             }
                             startActivity(intent)
+                            finish()
                         }
                         getString(R.string.course_e_pic) -> {
                             Toast.makeText(this, "Starting Bomber Game", Toast.LENGTH_SHORT).show()

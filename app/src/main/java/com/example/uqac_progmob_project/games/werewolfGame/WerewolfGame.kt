@@ -1,6 +1,9 @@
 package com.example.uqac_progmob_project.games.werewolfGame
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -39,6 +42,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +50,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
+import com.example.uqac_progmob_project.gameChoose.FinalResult
 import kotlinx.coroutines.delay
 
 class WerewolfGame : BaseActivity() {
@@ -60,13 +65,16 @@ class WerewolfGame : BaseActivity() {
         println("Player Names: $playerNames")
 
         setContent {
-            WerewolfGame(playerNames)
+            WerewolfGame(gameSessionName, playerNames)
         }
     }
 }
 
 @Composable
-fun WerewolfGame(playerNames: List<String>) {
+fun WerewolfGame(
+    gameSessionName: String,
+    playerNames: List<String>
+) {
     var gamePhase by remember { mutableStateOf("revealCards") }
     val roles = remember { assignRoles(playerNames).toMutableMap() }
     val eliminatedPlayers = remember { mutableStateListOf<String>() }
@@ -78,6 +86,7 @@ fun WerewolfGame(playerNames: List<String>) {
     var nightCount by remember { mutableIntStateOf(1) }
     var gameEnded by remember { mutableStateOf(false) }
     var winnerMessage by remember { mutableStateOf("") }
+    val playerScores = remember { mutableStateListOf(*List(playerNames.size) { 0 }.toTypedArray()) }
 
     fun checkVictory() {
         val alivePlayers = playerNames - eliminatedPlayers
@@ -88,22 +97,34 @@ fun WerewolfGame(playerNames: List<String>) {
             val (lover1, lover2) = loverPair!!
             if (alivePlayers.containsAll(listOf(lover1, lover2)) && alivePlayers.size == 2) {
                 winnerMessage = "💖 Victoire des Amoureux !"
-                gameEnded = true
+                playerScores[playerNames.indexOf(lover1)] = 1
+                playerScores[playerNames.indexOf(lover2)] = 1
+                gamePhase = "results"
                 return
             }
         }
 
         if (werewolvesAlive > 0 && villagersAlive == 0) {
             winnerMessage = "🐺 Victoire des Loups-Garous !"
-            gameEnded = true
+            playerNames.filter { roles[it] == "Loup-Garou" }.forEach {
+                playerScores[playerNames.indexOf(it)] = 1
+            }
+            gamePhase = "results"
         } else if (werewolvesAlive == 0) {
+            playerNames.filter { roles[it] != "Loup-Garou" }.forEach {
+                playerScores[playerNames.indexOf(it)] = 1
+            }
             winnerMessage = "🏡 Victoire des Villageois !"
-            gameEnded = true
+            gamePhase = "results"
         }
     }
 
     if (gameEnded) {
-        GameEndScreen(winnerMessage)
+        GameEnd(
+            gameSessionName,
+            playerNames,
+            playerScores
+        )
     } else {
         when (gamePhase) {
             "revealCards" -> WerewolfCardRevealed(playerNames, roles) { gamePhase = "night" }
@@ -167,8 +188,30 @@ fun WerewolfGame(playerNames: List<String>) {
                     checkVictory()
                 }
             )
+            "results" -> GameEndScreen(winnerMessage) {
+                gameEnded = true
+            }
         }
     }
+}
+
+@Composable
+fun GameEnd(
+    gameSessionName: String,
+    playerNames: List<String>,
+    playerScores: List<Int>
+) {
+    val context = LocalContext.current
+    Log.d("BombGamesScreen", "Ending game, gameSessionName: $gameSessionName, playerNames: $playerNames, playerScores: $playerScores")
+    Log.d("BombGamesScreen", "Navigating to FinalResult screen")
+    val intent = Intent(context, FinalResult::class.java).apply {
+        putExtra("GAMESESSIONNAME", gameSessionName)
+        putExtra("GAMETYPE", "Bleiz Garou")
+        putStringArrayListExtra("PLAYER_NAMES", ArrayList(playerNames))
+        putIntegerArrayListExtra("PLAYER_SCORES", ArrayList(playerScores))
+    }
+    context.startActivity(intent)
+    (context as Activity).finish()
 }
 
 @Composable
@@ -543,7 +586,10 @@ fun DebatePhase(onContinue: () -> Unit) {
 }
 
 @Composable
-fun GameEndScreen(winnerMessage: String) {
+fun GameEndScreen(
+    winnerMessage: String,
+    onConfirm: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -557,8 +603,8 @@ fun GameEndScreen(winnerMessage: String) {
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { /* Redémarrer le jeu ou revenir au menu */ }) {
-            Text("Rejouer 🔄")
+        Button(onClick = { onConfirm() }) {
+            Text("Continuer")
         }
     }
 }
