@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +36,7 @@ import com.example.uqac_progmob_project.BaseActivity
 import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.games.bomberGames.BombGames
 import com.example.uqac_progmob_project.games.triMann.TriMannGame
-
+import com.example.uqac_progmob_project.games.werewolfGame.WerewolfGame
 
 class GameSettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,9 +67,15 @@ class GameSettingsActivity : BaseActivity() {
                                 putExtra("GAMESESSIONNAME", finalGameSessionName)
                             }
                             startActivity(intent)
+                            finish()
                         }
                         getString(R.string.bleiz_garou) -> {
-                            Toast.makeText(this, "Starting Bomber Game", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(this, WerewolfGame::class.java).apply {
+                                putExtra("PLAYERSESSIONNAME", ArrayList(finalPlayerNames))
+                                putExtra("GAMESESSIONNAME", finalGameSessionName)
+                            }
+                            startActivity(intent)
+                            finish()
                         }
                         getString(R.string.course_e_pic) -> {
                             Toast.makeText(this, "Starting Bomber Game", Toast.LENGTH_SHORT).show()
@@ -98,7 +105,7 @@ class GameSettingsActivity : BaseActivity() {
         onPlayClick: (String, List<String>) -> Unit
     ) {
         var gameSessionName by remember { mutableStateOf("") }
-        var numberOfPlayers by remember { mutableStateOf(2) }
+        var numberOfPlayers by remember { mutableIntStateOf(2) }
         val playerNames = remember { mutableStateListOf("", "") }
 
         Column(
@@ -147,7 +154,7 @@ class GameSettingsActivity : BaseActivity() {
                 Text(text = numberOfPlayers.toString(), fontSize = 16.sp)
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(onClick = {
-                    if (numberOfPlayers < 5) {
+                    if (numberOfPlayers < 16) {
                         numberOfPlayers++
                         playerNames.add("")
                     }
