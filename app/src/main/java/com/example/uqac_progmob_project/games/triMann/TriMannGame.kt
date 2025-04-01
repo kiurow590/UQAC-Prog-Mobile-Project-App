@@ -128,9 +128,9 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
             continueTurn = true
         }
 
-        // Si c'est un 3 ou une somme de 3, le trimann gagne 2 points
+        // Si c'est un 3 ou une somme de 3, le trimann prend 2 points
         if (dice1 == 3 || dice2 == 3 || (dice1 + dice2 == 3)) {
-            rollResultMessage = "Tri ! ${players[trimanPlayerIndex]} gagne 2 points"
+            rollResultMessage = "Tri ! ${players[trimanPlayerIndex]} prend 2 points"
             playerScores[trimanPlayerIndex] += 2
             continueTurn = true
         }
@@ -139,18 +139,18 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
         if (dice1 == 7 || dice2 == 7 || (dice1 + dice2 == 7)) {
             val previousPlayerIndex = (currentPlayerIndex - 1 + players.size) % players.size
             playerScores[previousPlayerIndex] += 2
-            rollResultMessage = "${players[previousPlayerIndex]} gagne 2 points car c'est un total de 7"
+            rollResultMessage = "${players[previousPlayerIndex]} prend 2 points car c'est un total de 7"
             continueTurn = true
         } else if (dice1 == 9 || dice2 == 9 || (dice1 + dice2 == 9)) {
             val nextPlayerIndex = (currentPlayerIndex + 1) % players.size
             playerScores[nextPlayerIndex] += 2
-            rollResultMessage = "${players[nextPlayerIndex]} gagne 2 points car c'est un total de 9"
+            rollResultMessage = "${players[nextPlayerIndex]} prend 2 points car c'est un total de 9"
             continueTurn = true
         }
 
-        // Vérifier si le joueur gagne des points (double impair ou autre condition)
+        // Vérifier si le joueur prend des points (double impair ou autre condition)
         if (dice1 == dice2 && dice1 % 2 != 0) {
-            rollResultMessage = "${players[currentPlayerIndex]} gagne $dice1Result points (double impair) !"
+            rollResultMessage = "${players[currentPlayerIndex]} prend $dice1Result points (double impair) !"
             playerScores[currentPlayerIndex] += dice1
             continueTurn = true
         }
@@ -163,7 +163,7 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
                 showPlayerList = true
             } else {
                 val total = if (dice1 == 6) dice2 else dice1
-                rollResultMessage = "Posez $total doigts sur la table"
+                rollResultMessage = "Posez $total doigts sur la table, le dernier prend 2 points !"
                 pointsToDistribute = 2
                 showPlayerList = true
             }
