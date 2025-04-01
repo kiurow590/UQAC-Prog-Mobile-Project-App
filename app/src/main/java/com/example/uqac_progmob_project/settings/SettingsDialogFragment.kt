@@ -42,7 +42,9 @@ fun SettingsDialog(
                         value = selectedLanguage,
                         onValueChange = {},
                         readOnly = true,
-                        modifier = Modifier.fillMaxWidth(), // Corrected modifier
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(), // ✅ Assure un bon positionnement du menu
                         label = { Text(text = stringResource(id = R.string.language)) },
                     )
                     DropdownMenu(
