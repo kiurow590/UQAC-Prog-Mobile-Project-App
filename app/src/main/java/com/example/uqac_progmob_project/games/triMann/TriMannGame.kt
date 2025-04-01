@@ -158,14 +158,14 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
         // Vérifier si un 6 est lancé
         if (dice1 == 6 || dice2 == 6) {
             if (dice1 == 6 && dice2 == 6) {
-                rollResultMessage = "Double 6, le perdant du chifoumi reçoit 2 points !"
-                val loserIndex = (currentPlayerIndex + 1) % players.size
-                playerScores[loserIndex] += 2
+                rollResultMessage = "Double 6, ${players[currentPlayerIndex]} choisis 2 joueurs qui font un chifoumi et le perdant reçoit 2 points !"
+                pointsToDistribute = 2
+                showPlayerList = true
             } else {
                 val total = if (dice1 == 6) dice2 else dice1
                 rollResultMessage = "Posez $total doigts sur la table"
                 pointsToDistribute = 2
-                showPlayerList = true  // Afficher la liste des joueurs pour sélectionner un joueur
+                showPlayerList = true
             }
             continueTurn = true
         }
