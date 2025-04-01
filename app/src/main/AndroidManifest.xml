@@ -54,6 +54,14 @@
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".games.triMann.TriMannGame"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".games.werewolfGame.WerewolfGame"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".gameChoose.FinalResult"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait" />
