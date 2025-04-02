@@ -45,11 +45,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
+import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.gameChoose.FinalResult
 import kotlinx.coroutines.delay
 
@@ -629,7 +629,7 @@ fun VotingPhase(
     ) {
         if (currentVoter != null) {
             Text(
-                text = "📱 Passez le téléphone à $currentVoter pour voter",
+                text = "📱 Passez le téléphone à $currentVoter",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
