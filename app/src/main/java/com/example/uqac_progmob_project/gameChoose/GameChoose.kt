@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -23,6 +24,7 @@ import com.example.uqac_progmob_project.R
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -86,21 +88,21 @@ fun GameChooseScreen(
 
         // Liste des jeux sous forme de grille 2x2
         val games = listOf(
-            stringResource(id = R.string.triMannGame) to stringResource(id = R.string.triMannGameDescription),
-            stringResource(id = R.string.bleiz_garou) to stringResource(id = R.string.bleiz_garou_Description),
-            stringResource(id = R.string.course_e_pic) to stringResource(id = R.string.course_e_pic_description),
-            stringResource(id = R.string.et_boom) to stringResource(id = R.string.et_boom_description)
+            Triple(stringResource(id = R.string.triMannGame), stringResource(id = R.string.triMannGameDescription), false),
+            Triple(stringResource(id = R.string.bleiz_garou), stringResource(id = R.string.bleiz_garou_Description), false),
+            Triple(stringResource(id = R.string.course_e_pic), stringResource(id = R.string.course_e_pic_description), true),
+            Triple(stringResource(id = R.string.et_boom), stringResource(id = R.string.et_boom_description), false)
         )
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2), // ✅ Grille 2x2
+            columns = GridCells.Fixed(2),
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(games) { (title, description) ->
-                GameButton(text = title, description = description, onClick = onGameClick)
+            items(games) { (title, description, isLocked) ->
+                GameButton(text = title, description = description, onClick = onGameClick, isLocked = isLocked)
             }
         }
     }
@@ -137,14 +139,24 @@ fun TopBanner(
 }
 
 @Composable
-fun GameButton(text: String, description: String, onClick: (String, String) -> Unit) {
+fun GameButton(text: String, description: String, onClick: (String, String) -> Unit, isLocked: Boolean = false) {
     Button(
-        onClick = { onClick(text, description) },
+        onClick = { if (!isLocked) onClick(text, description) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 8.dp),
+        enabled = !isLocked
     ) {
-        Text(text)
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(text, modifier = Modifier.align(Alignment.CenterStart))
+            if (isLocked) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Locked",
+                    modifier = Modifier.align(Alignment.TopEnd)
+                )
+            }
+        }
     }
 }
 
