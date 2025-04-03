@@ -17,8 +17,6 @@ import androidx.compose.ui.unit.dp
 import com.example.uqac_progmob_project.LanguageManager
 import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.mainActivity.MainActivity
-import kotlin.text.toFloat
-import kotlin.text.toInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

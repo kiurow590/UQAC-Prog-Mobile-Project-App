@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import com.example.uqac_progmob_project.settings.SettingsDialog
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -34,6 +37,7 @@ class GameChoose : AppCompatActivity() {
         supportActionBar?.hide()
         setContent {
             var showDialog by remember { mutableStateOf(false) }
+            var showSettingsDialog by remember { mutableStateOf(false) }
             val user = FirebaseAuth.getInstance().currentUser
 
             GameChooseScreen(
@@ -43,6 +47,9 @@ class GameChoose : AppCompatActivity() {
                 },
                 onAccountClick = {
                     showDialog = true
+                },
+                onSettingsClick = {
+                    showSettingsDialog = true
                 },
                 onGameClick = { gameName, gameDescription ->
                     startGameDetailActivity(gameName, gameDescription)
@@ -56,6 +63,13 @@ class GameChoose : AppCompatActivity() {
                     userProfilePicture = user.photoUrl?.toString(),
                     onDismissRequest = { showDialog = false },
                     onConfirmClick = { showDialog = false }
+                )
+            }
+
+            if (showSettingsDialog) {
+                SettingsDialog(
+                    onDismissRequest = { showSettingsDialog = false },
+                    onConfirm = { showSettingsDialog = false }
                 )
             }
         }
@@ -75,23 +89,62 @@ fun GameChooseScreen(
     onBackClick: () -> Unit,
     onHistoryClick: () -> Unit,
     onAccountClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     onGameClick: (String, String) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
         TopBanner(
             onBackClick = onBackClick,
             onHistoryClick = onHistoryClick,
-            onAccountClick = onAccountClick
+            onAccountClick = onAccountClick,
+            onSettingsClick = onSettingsClick
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Texte encadré sous la TopAppBar
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+        ) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(id = R.string.gamechoose),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Color.Black
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Liste des jeux sous forme de grille 2x2
         val games = listOf(
-            Triple(stringResource(id = R.string.triMannGame), stringResource(id = R.string.triMannGameDescription), false),
-            Triple(stringResource(id = R.string.bleiz_garou), stringResource(id = R.string.bleiz_garou_Description), false),
-            Triple(stringResource(id = R.string.course_e_pic), stringResource(id = R.string.course_e_pic_description), true),
-            Triple(stringResource(id = R.string.et_boom), stringResource(id = R.string.et_boom_description), false)
+            Triple(
+                stringResource(id = R.string.triMannGame),
+                stringResource(id = R.string.triMannGameDescription),
+                false
+            ),
+            Triple(
+                stringResource(id = R.string.bleiz_garou),
+                stringResource(id = R.string.bleiz_garou_Description),
+                false
+            ),
+            Triple(
+                stringResource(id = R.string.course_e_pic),
+                stringResource(id = R.string.course_e_pic_description),
+                true
+            ),
+            Triple(
+                stringResource(id = R.string.et_boom),
+                stringResource(id = R.string.et_boom_description),
+                false
+            )
         )
 
         LazyVerticalGrid(
@@ -102,7 +155,12 @@ fun GameChooseScreen(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(games) { (title, description, isLocked) ->
-                GameButton(text = title, description = description, onClick = onGameClick, isLocked = isLocked)
+                GameButton(
+                    text = title,
+                    description = description,
+                    onClick = onGameClick,
+                    isLocked = isLocked
+                )
             }
         }
     }
@@ -113,10 +171,11 @@ fun GameChooseScreen(
 fun TopBanner(
     onBackClick: () -> Unit,
     onHistoryClick: () -> Unit,
-    onAccountClick: () -> Unit
+    onAccountClick: () -> Unit,
+    onSettingsClick: () -> Unit // Ajout du paramètre pour le clic sur les paramètres
 ) {
     TopAppBar(
-        title = {stringResource(id = R.string.gamechoose) },
+        title = { stringResource(id = R.string.gamechoose) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -124,10 +183,17 @@ fun TopBanner(
         },
         actions = {
             IconButton(onClick = onHistoryClick) {
-                Icon(Icons.Filled.Info, contentDescription = "History")
+                Icon(
+                    painter = painterResource(id = R.drawable.manage_search_32dp_e3e3e3_fill0_wght400_grad0_opsz40),
+                    contentDescription = "History",
+                    modifier = Modifier.size(27.dp) // Définir la taille de l'icône
+                )
             }
             IconButton(onClick = onAccountClick) {
                 Icon(Icons.Default.Person, contentDescription = "Account")
+            }
+            IconButton(onClick = onSettingsClick) { // Ajout du bouton des paramètres
+                Icon(Icons.Default.Settings, contentDescription = "Settings")
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -139,7 +205,12 @@ fun TopBanner(
 }
 
 @Composable
-fun GameButton(text: String, description: String, onClick: (String, String) -> Unit, isLocked: Boolean = false) {
+fun GameButton(
+    text: String,
+    description: String,
+    onClick: (String, String) -> Unit,
+    isLocked: Boolean = false
+) {
     Button(
         onClick = { if (!isLocked) onClick(text, description) },
         modifier = Modifier
@@ -167,6 +238,7 @@ fun PreviewGameChooseScreen() {
         onBackClick = {},
         onHistoryClick = {},
         onAccountClick = {},
+        onSettingsClick = {},
         onGameClick = { _, _ -> }
     )
 }
