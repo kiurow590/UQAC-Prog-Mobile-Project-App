@@ -21,12 +21,19 @@ jobs:
         
     - name: Setup Google Services
       run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > app/google-services.json
-      
+    
+    - name: Install pngquant
+      run: sudo apt-get install -y pngquant
+    
+    - name: Optimize problematic PNG
+      run: pngquant --quality=65-80 --strip --force --ext .png app/src/main/res/drawable/ouest_forge_game.png
+      continue-on-error: false
+        
     - name: Download dependencies
-      run: ./gradlew build --stacktrace
+      run: ./gradlew build --info --stacktrace
       
     - name: Build APK
-      run: ./gradlew assembleRelease --stacktrace
+      run: ./gradlew assembleRelease --info --stacktrace
       
     - name: Upload APK
       uses: actions/upload-artifact@v4
