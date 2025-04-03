@@ -4,6 +4,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+permissions:
+  contents: write  # Donne l'autorisation d'écrire dans le contenu du dépôt (nécessaire pour les releases)
 jobs:
   build:
     runs-on: ubuntu-latest
