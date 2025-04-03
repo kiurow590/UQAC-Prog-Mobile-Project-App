@@ -4,8 +4,10 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+
 permissions:
-  contents: write  # Donne l'autorisation d'écrire dans le contenu du dépôt (nécessaire pour les releases)
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,28 +29,33 @@ jobs:
     
     - name: Optimize problematic PNG
       run: pngquant --quality=65-80 --strip --force --ext .png app/src/main/res/drawable/ouest_forge_game.png
-      continue-on-error: false
+      continue-on-error: true
+      
+    - name: Create keystore file
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
+      
+    - name: Build signed APK
+      run: |
+        ./gradlew assembleRelease \
+        -Pandroid.injected.signing.store.file=$(pwd)/keystore.jks \
+        -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+        -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+        -Pandroid.injected.signing.key.password=${{ secrets.KEYSTORE_PASSWORD }} \
+        --info --stacktrace
         
-    - name: Download dependencies
-      run: ./gradlew build --info --stacktrace
-      
-    - name: Build APK
-      run: ./gradlew assembleRelease --info --stacktrace
-      
     - name: Upload APK as artifact
       uses: actions/upload-artifact@v4
       with:
         name: app-release.apk
-        path: app/build/outputs/apk/release/app-release-unsigned.apk
+        path: app/build/outputs/apk/release/app-release.apk
         
     - name: Create GitHub Release
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       uses: softprops/action-gh-release@v1
       with:
-        files: app/build/outputs/apk/release/app-release-unsigned.apk
+        files: app/build/outputs/apk/release/app-release.apk
         tag_name: v${{ github.run_number }}
         name: Release v${{ github.run_number }}
-        draft: false
-        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
