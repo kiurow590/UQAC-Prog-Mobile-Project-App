@@ -3,6 +3,7 @@ package com.example.uqac_progmob_project.games.werewolfGame
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -49,13 +50,17 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
-import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.gameChoose.FinalResult
 import kotlinx.coroutines.delay
+import java.util.Locale
 
-class WerewolfGame : BaseActivity() {
+class WerewolfGame : BaseActivity(), TextToSpeech.OnInitListener {
+    private var tts: TextToSpeech? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        tts = TextToSpeech(this, this)
 
         val gameSessionName = intent.getStringExtra("GAMESESSIONNAME") ?: ""
         val playerNames = intent.getStringArrayListExtra("PLAYERSESSIONNAME") ?: listOf()
@@ -65,15 +70,43 @@ class WerewolfGame : BaseActivity() {
         println("Player Names: $playerNames")
 
         setContent {
-            WerewolfGame(gameSessionName, playerNames)
+            WerewolfGame(gameSessionName, playerNames) { text ->
+                speakOut(text)
+            }
         }
+    }
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = tts!!.setLanguage(Locale.FRENCH)
+
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TextToSpeech", "Language not supported")
+            }
+        } else {
+            Log.e("TextToSpeech", "Initialization failed")
+        }
+    }
+
+    override fun onDestroy() {
+        if (tts != null) {
+            tts!!.stop()
+            tts!!.shutdown()
+        }
+
+        super.onDestroy()
+    }
+
+    fun speakOut(text: String) {
+        tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
     }
 }
 
 @Composable
 fun WerewolfGame(
     gameSessionName: String,
-    playerNames: List<String>
+    playerNames: List<String>,
+    speakOut: (String) -> Unit
 ) {
     var gamePhase by remember { mutableStateOf("revealCards") }
     val roles = remember { assignRoles(playerNames).toMutableMap() }
