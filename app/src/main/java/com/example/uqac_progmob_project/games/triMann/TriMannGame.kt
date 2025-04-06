@@ -2,7 +2,12 @@ package com.example.uqac_progmob_project.games.triMann
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -20,15 +25,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
 import com.example.uqac_progmob_project.R
 import com.example.uqac_progmob_project.gameChoose.FinalResult
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 class TriMannGame : BaseActivity() {
@@ -83,6 +90,7 @@ fun DiceImage(diceNumber: Int, rotation: Float) {
             .rotate(rotationAnimation)
     )
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
@@ -101,9 +109,20 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
     var trimanPlayerIndex: Int by remember { mutableIntStateOf((0..<players.size).random()) }
     var showPlayerList: Boolean by remember { mutableStateOf(false) }
     var pointsToDistribute: Int by remember { mutableIntStateOf(0) }
-    var distributedPoints: MutableList<Int> by remember { mutableStateOf(MutableList(players.size) { 0 }) }
+    var selectedPlayers: List<String> by remember { mutableStateOf(emptyList()) }
+    var shifoumiPlayers: List<String> by remember { mutableStateOf(emptyList()) }
+    var shifoumiLoser: String? by remember { mutableStateOf(null) }
+    val distributedPoints = remember { mutableStateListOf<Int>().apply { addAll(List(players.size) { 0 }) } }
     var totalDistributedPoints: Int by remember { mutableIntStateOf(0) }
     var rollResultMessage: String by remember { mutableStateOf("") }
+
+    // Sensor Manager and Shake Detection
+    val contextsensor = LocalContext.current
+    val sensorManager = remember { contextsensor.getSystemService(Context.SENSOR_SERVICE) as SensorManager }
+    val accelerometer = remember { sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) }
+    var lastAccelerometerUpdate: Long by remember { mutableStateOf(0) }
+    var lastAccelerometerValues = FloatArray(3)
+
 
     // Fonction pour changer de joueur
     fun nextPlayer() {
@@ -112,12 +131,16 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
         }
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size
         showPlayerList = false
-        distributedPoints = MutableList(players.size) { 0 } // Reset distributed points
+        shifoumiPlayers = emptyList()
+        shifoumiLoser = null
+        distributedPoints.clear()
+        distributedPoints.addAll(List(players.size) { 0 })
         totalDistributedPoints = 0 // Reset total distributed points
     }
-    //Appliquer les règles du jeu
+
+    // Fonction pour appliquer les règles et déterminer si le tour continue ou s'il est terminé
     fun applyGameRules(dice1: Int, dice2: Int): Boolean {
-        continueTurn = false  // Réinitialiser continueTurn à false au début de chaque tour
+        continueTurn = false  // Variable pour déterminer si le tour continue
 
         // Vérifier si c'est un double pair et différent de 6
         if (dice1 == dice2 && dice1 % 2 == 0 && dice1 != 6) {
@@ -125,12 +148,13 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
             playerScores[currentPlayerIndex] += dice1Result
             pointsToDistribute = dice1Result  // n points à distribuer
             showPlayerList = true  // Afficher la liste des joueurs
+            Log.d("TriMannGame", "Double pair, showing player list")
             continueTurn = true
         }
 
-        // Si c'est un 3 ou une somme de 3, le trimann prend 2 points
+        // Si c'est un 3 ou une somme de 3, le trimann gagne 2 points
         if (dice1 == 3 || dice2 == 3 || (dice1 + dice2 == 3)) {
-            rollResultMessage = "Tri ! ${players[trimanPlayerIndex]} prend 2 points"
+            rollResultMessage = "Tri ! ${players[trimanPlayerIndex]} gagne 2 points"
             playerScores[trimanPlayerIndex] += 2
             continueTurn = true
         }
@@ -139,18 +163,18 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
         if (dice1 == 7 || dice2 == 7 || (dice1 + dice2 == 7)) {
             val previousPlayerIndex = (currentPlayerIndex - 1 + players.size) % players.size
             playerScores[previousPlayerIndex] += 2
-            rollResultMessage = "${players[previousPlayerIndex]} prend 2 points car c'est un total de 7"
+            rollResultMessage = "${players[previousPlayerIndex]} gagne 2 points"
             continueTurn = true
         } else if (dice1 == 9 || dice2 == 9 || (dice1 + dice2 == 9)) {
             val nextPlayerIndex = (currentPlayerIndex + 1) % players.size
             playerScores[nextPlayerIndex] += 2
-            rollResultMessage = "${players[nextPlayerIndex]} prend 2 points car c'est un total de 9"
+            rollResultMessage = "${players[nextPlayerIndex]} gagne 2 points"
             continueTurn = true
         }
 
-        // Vérifier si le joueur prend des points (double impair ou autre condition)
+        // Vérifier si le joueur gagne des points (double impair ou autre condition)
         if (dice1 == dice2 && dice1 % 2 != 0) {
-            rollResultMessage = "${players[currentPlayerIndex]} prend $dice1Result points (double impair) !"
+            rollResultMessage = "${players[currentPlayerIndex]} gagne $dice1Result points (double impair) !"
             playerScores[currentPlayerIndex] += dice1
             continueTurn = true
         }
@@ -158,25 +182,28 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
         // Vérifier si un 6 est lancé
         if (dice1 == 6 || dice2 == 6) {
             if (dice1 == 6 && dice2 == 6) {
-                rollResultMessage = "Double 6, ${players[currentPlayerIndex]} choisis 2 joueurs qui font un chifoumi et le perdant reçoit 2 points !"
-                pointsToDistribute = 2
-                showPlayerList = true
+                rollResultMessage = "Double 6, choisissez deux joueurs pour le chifoumi !"
+                showPlayerList = true  // Afficher la liste des joueurs pour sélectionner deux joueurs
+                Log.d("TriMannGame", "Double 6, showing player list for shifoumi")
+                selectedPlayers = emptyList()  // Réinitialiser les joueurs sélectionnés
             } else {
                 val total = if (dice1 == 6) dice2 else dice1
-                rollResultMessage = "Posez $total doigts sur la table, le dernier prend 2 points !"
+                rollResultMessage = "Posez $total doigts sur la table"
                 pointsToDistribute = 2
-                showPlayerList = true
+                showPlayerList = true  // Afficher la liste des joueurs pour sélectionner un joueur
+                Log.d("TriMannGame", "Single 6, showing player list for point distribution")
             }
             continueTurn = true
         }
 
         if (!continueTurn) {
             rollResultMessage = "Le tour de ${players[currentPlayerIndex]} est terminé, aucun évènement n'a eu lieu."
+            nextPlayer()
         }
 
-        return continueTurn  // Retourne true si le tour continue, false sinon
+        return !continueTurn  // Retourne true si le tour est terminé
     }
-    // Lancer les dés et changer de joueur
+
     fun rollDiceAndApplyRules() {
         val dice1 = (1..6).random()
         val dice2 = (1..6).random()
@@ -186,7 +213,39 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
         rotation2 = Random.nextFloat() * 360f  // Générer une rotation aléatoire pour le deuxième dé
         Log.d("TriMannGame", "Résultat des dés : $dice1, $dice2")
         roundEnded = !applyGameRules(dice1, dice2)
-        Log.d("TriMannGame", "Message : $rollResultMessage")
+    }
+
+    // Shake Detection Listener
+    val sensorEventListener = remember {
+        object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                val currentTime = System.currentTimeMillis()
+                if ((currentTime - lastAccelerometerUpdate) > 100) {
+                    val diffTime = (currentTime - lastAccelerometerUpdate) * 1e-9
+                    val x = event.values[0]
+                    val y = event.values[1]
+                    val z = event.values[2]
+                    // Calculer la vitesse et l'accélération
+                    val acceleration = sqrt((x * x + y * y + z * z) )
+                    if (acceleration > 12) {
+                        rollDiceAndApplyRules()
+                    }
+                    lastAccelerometerUpdate = currentTime
+                    lastAccelerometerValues[0] = x
+                    lastAccelerometerValues[1] = y
+                    lastAccelerometerValues[2] = z
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        }
+    }
+
+    DisposableEffect(Unit) {
+        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+        onDispose {
+            sensorManager.unregisterListener(sensorEventListener)
+        }
     }
 
     Column(
@@ -233,6 +292,7 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
 
             // Afficher la liste des joueurs si nécessaire
             if (showPlayerList) {
+                Log.d("TriMannGame", "Player list should be visible")
                 Spacer(modifier = Modifier.height(20.dp))
                 Text("Liste des joueurs:", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 LazyColumn {
@@ -270,6 +330,14 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
                                         Text("+")
                                     }
                                 }
+                            } else {
+                                Button(onClick = {
+                                    if (shifoumiPlayers.size < 2) {
+                                        shifoumiPlayers = shifoumiPlayers + player
+                                    }
+                                }) {
+                                    Text("Désigner")
+                                }
                             }
                         }
                     }
@@ -283,10 +351,25 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
                                 }
                                 pointsToDistribute = 0
                                 showPlayerList = false
-                                distributedPoints = MutableList(players.size) { 0 } // Reset distributed points
+                                distributedPoints.clear()
+                                distributedPoints.addAll(List(players.size) { 0 })
                                 totalDistributedPoints = 0 // Reset total distributed points
                             }) {
                                 Text("Valider la distribution")
+                            }
+                        }
+                    } else if (shifoumiPlayers.size == 2) {
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Text("Joueurs sélectionnés pour le shifoumi : ${shifoumiPlayers.joinToString(", ")}", fontSize = 16.sp)
+                            Button(onClick = {
+                                shifoumiLoser = shifoumiPlayers.random()
+                                playerScores[players.indexOf(shifoumiLoser!!)] += 2
+                                showPlayerList = false
+                                shifoumiPlayers = emptyList() // Reset shifoumi players
+                                shifoumiLoser = null // Reset shifoumi loser
+                            }) {
+                                Text("Désigner le perdant")
                             }
                         }
                     }
@@ -318,6 +401,7 @@ fun TriMannGameScreen(gameSessionName: String, playerNames: List<String>) {
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewTrimannGameScreen() {
