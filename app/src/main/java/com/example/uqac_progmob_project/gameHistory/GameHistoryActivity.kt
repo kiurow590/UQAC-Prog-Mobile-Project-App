@@ -9,11 +9,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
@@ -79,89 +85,203 @@ fun fetchUserGameHistory(userId: String, onResult: (List<GameHistoryItem>) -> Un
         }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameHistoryScreen(historyData: List<GameHistoryItem>, onBackClick: () -> Unit) {
     val groupedHistory = historyData.groupBy { it.category }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        IconButton(onClick = onBackClick) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(id = R.string.history_game),
-            fontSize = 24.sp,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn {
-            groupedHistory.forEach { (category, items) ->
-                item {
-                    CategoryItemView(category, items)
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                TopAppBar(
+                    title = { stringResource(id = R.string.gamechoose) },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.White,
+                        titleContentColor = Color.Black,
+                        actionIconContentColor = Color.Black
+                    )
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                // Texte encadré sous la TopAppBar
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+                ) {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = stringResource(id = R.string.history_game),
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(16.dp),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = Color.Black
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    groupedHistory.forEach { (category, items) ->
+                        item {
+                            CategoryItemView(category, items)
+                        }
+                    }
                 }
             }
         }
     }
 }
 
+
 @Composable
 fun CategoryItemView(category: String, items: List<GameHistoryItem>) {
     var expanded by remember { mutableStateOf(false) }
-    Column(modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded }) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = category, fontSize = 22.sp)
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = if (expanded) "Collapse" else "Expand"
-            )
-        }
-        if (expanded) {
-            items.forEach { gameHistoryItem ->
-                GameHistoryItemView(gameHistoryItem)
-                Spacer(modifier = Modifier.height(16.dp))
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+    ) {
+        Column(modifier = Modifier
+            .clickable { expanded = !expanded }
+            .padding(12.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = category,
+                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    imageVector = if (expanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = if (expanded) "Collapse" else "Expand"
+                )
+            }
+
+            if (expanded) {
+                Spacer(modifier = Modifier.height(8.dp))
+                items.forEach { gameHistoryItem ->
+                    GameHistoryItemView(gameHistoryItem)
+                }
             }
         }
     }
 }
+
 
 
 @Composable
 fun GameHistoryItemView(gameHistoryItem: GameHistoryItem) {
     var expanded by remember { mutableStateOf(false) }
-    Column(modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded }) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = gameHistoryItem.gameName, fontSize = 20.sp)
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = if (expanded) "Collapse" else "Expand"
-            )
-        }
-        if (expanded) {
-            Text(text = gameHistoryItem.sessionName, fontSize = 16.sp)
-            Spacer(modifier = Modifier.height(8.dp))
 
-            // Affichage des 3 premiers scores horizontalement
-            Row {
-                gameHistoryItem.playerScores.take(3).forEach { playerScore ->
-                    Column(modifier = Modifier.padding(8.dp)) {
-                        Text(text = playerScore.playerName, fontSize = 14.sp)
-                        Text(text = "${playerScore.score} pts", fontSize = 14.sp)
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clickable { expanded = !expanded },
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = gameHistoryItem.gameName,
+                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    imageVector = if (expanded) Icons.Default.KeyboardArrowDown else Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = if (expanded) "Collapse" else "Expand"
+                )
+            }
+
+            if (expanded) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Session: ${gameHistoryItem.sessionName}",
+                    fontSize = 14.sp,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    gameHistoryItem.playerScores.take(3).forEach { playerScore ->
+                        Column {
+                            Text(
+                                text = playerScore.playerName,
+                                fontSize = 14.sp,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "${playerScore.score} pts",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
-            }
-            // Affichage des joueurs restants verticalement
-            Column {
+
                 gameHistoryItem.playerScores.drop(3).forEach { playerScore ->
-                    Column(modifier = Modifier.padding(8.dp)) {
-                        Text(text = playerScore.playerName, fontSize = 14.sp)
-                        Text(text = "${playerScore.score} pts", fontSize = 14.sp)
+                    Column(modifier = Modifier.padding(top = 8.dp)) {
+                        Text(
+                            text = playerScore.playerName,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = "${playerScore.score} pts",
+                            fontSize = 14.sp
+                        )
                     }
                 }
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewGameHistoryScreen() {
+    val sampleData = listOf(
+        GameHistoryItem(
+            gameName = "Partie 1",
+            sessionName = "Session 1",
+            playerScores = listOf(
+                PlayerScore("Joueur 1", 100),
+                PlayerScore("Joueur 2", 80),
+                PlayerScore("Joueur 3", 60)
+            ),
+            category = "Catégorie A"
+        ),
+        GameHistoryItem(
+            gameName = "Partie 2",
+            sessionName = "Session 2",
+            playerScores = listOf(
+                PlayerScore("Joueur 1", 120),
+                PlayerScore("Joueur 2", 90)
+            ),
+            category = "Catégorie B"
+        )
+    )
+
+    GameHistoryScreen(
+        historyData = sampleData,
+        onBackClick = {}
+    )
 }
 
 
