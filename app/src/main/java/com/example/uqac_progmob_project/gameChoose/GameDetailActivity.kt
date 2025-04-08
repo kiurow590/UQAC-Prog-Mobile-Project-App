@@ -6,19 +6,18 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,16 +28,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
 
 class GameDetailActivity : BaseActivity() {
@@ -72,28 +70,40 @@ class GameDetailActivity : BaseActivity() {
 fun GameDetailScreen(
     gameName: String,
     gameDescription: String,
-    gameIconResId: Int? = null, // Optionnel : image/illustration
+    gameIconResId: Int? = null,
     onBackClick: () -> Unit,
     onPlayClick: () -> Unit
 ) {
+    // 🎨 Palette personnalisée en nuances claires de gris
+    val backgroundColor = Color(0xFFF5F5F5)
+    val surfaceVariant = Color(0xFFEDEDED)
+    val primaryTextColor = Color(0xFF333333)
+    val labelTextColor = Color(0xFF666666)
+    val buttonColor = Color(0xFFE0E0E0)
+
     Scaffold(
+        containerColor = backgroundColor,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = gameName,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge.copy(color = primaryTextColor),
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = primaryTextColor
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                    containerColor = surfaceVariant
                 )
             )
         }
@@ -109,10 +119,9 @@ fun GameDetailScreen(
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 🔹 Image du jeu (si fournie)
+            // Image du jeu
             gameIconResId?.let { resId ->
                 Image(
                     painter = painterResource(id = resId),
@@ -126,35 +135,38 @@ fun GameDetailScreen(
                 )
             }
 
-            // 🔹 Description dans une surface élégante
+            // Description dans une surface douce
             Surface(
                 shape = RoundedCornerShape(12.dp),
                 tonalElevation = 2.dp,
-                color = MaterialTheme.colorScheme.surfaceVariant,
+                color = surfaceVariant,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Description",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        style = MaterialTheme.typography.titleMedium.copy(color = labelTextColor)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = gameDescription,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium.copy(color = primaryTextColor),
                         textAlign = TextAlign.Justify
                     )
                 }
             }
 
-            // 🔹 Bouton de lancement en bas
+            // Bouton Jouer
             Button(
                 onClick = onPlayClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = buttonColor,
+                    contentColor = primaryTextColor
+                )
             ) {
                 Text(text = "Jouer", style = MaterialTheme.typography.titleMedium)
             }
@@ -163,6 +175,9 @@ fun GameDetailScreen(
         }
     }
 }
+
+
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewGameDetailScreen() {

@@ -87,5 +87,7 @@ dependencies {
     implementation (libs.firebase.auth)
     implementation (libs.androidx.credentials)
     implementation (libs.firebase.auth)
+    implementation (libs.androidx.material.icons.extended)
 
+    implementation (libs.material3)
 }
