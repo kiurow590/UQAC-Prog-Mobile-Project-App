@@ -57,9 +57,30 @@ class GoogleAuthHelper(private val context: Context) {
                 val result = credentialManager.getCredential(context, request)
                 handleSignIn(result, rawNonce)
             } catch (e: GetCredentialException) {
-                Log.e("GoogleSignIn", "Erreur de connexion Google : ${e.message}")
+                if (e.message?.contains("No credentials available") == true) {
+                    Log.e("GoogleSignIn", "Aucun credential disponible")
+                    // Propose à l'utilisateur de se connecter
+                    showNoCredentialsDialog()
+                } else {
+                    Log.e("GoogleSignIn", "Erreur de connexion Google : ${e.message}")
+                }
             }
         }
+    }
+
+    // 🔹 Affiche un dialogue pour informer l'utilisateur
+    private fun showNoCredentialsDialog() {
+        val builder = android.app.AlertDialog.Builder(context)
+        builder.setTitle("Aucun compte disponible")
+        builder.setMessage("Aucun compte Google n'est disponible. Voulez-vous en ajouter un ?")
+        builder.setPositiveButton("Ajouter un compte") { _, _ ->
+            // Redirige l'utilisateur vers les paramètres pour ajouter un compte
+            val intent = Intent(android.provider.Settings.ACTION_ADD_ACCOUNT)
+            intent.putExtra(android.provider.Settings.EXTRA_ACCOUNT_TYPES, arrayOf("com.google"))
+            context.startActivity(intent)
+        }
+        builder.setNegativeButton("Annuler", null)
+        builder.show()
     }
 
     // 🔹 Gère la réponse de Google Credential Manager
