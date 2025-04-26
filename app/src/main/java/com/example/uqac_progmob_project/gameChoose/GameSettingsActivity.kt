@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
@@ -125,10 +126,13 @@ class GameSettingsActivity : BaseActivity() {
         val textGray = Color(0xFF333333)
         val labelGray = Color(0xFF666666)
         val buttonGray = Color(0xFFE0E0E0)
+        val minPlayers = if (gameName == stringResource(id = R.string.bleiz_garou)) 8 else 2
 
         var gameSessionName by remember { mutableStateOf("") }
-        var numberOfPlayers by remember { mutableIntStateOf(2) }
-        val playerNames = remember { mutableStateListOf("", "") }
+        var numberOfPlayers by remember { mutableIntStateOf(minPlayers) }
+        val playerNames = remember { mutableStateListOf<String>().apply {
+            repeat(minPlayers) { add("") }
+        } }
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -147,12 +151,6 @@ class GameSettingsActivity : BaseActivity() {
                             tint = textGray
                         )
                     }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = gameName,
-                        fontSize = 24.sp,
-                        color = textGray
-                    )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -178,7 +176,7 @@ class GameSettingsActivity : BaseActivity() {
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = {
-                        if (numberOfPlayers > 2) {
+                        if (numberOfPlayers > minPlayers) {
                             numberOfPlayers--
                             playerNames.removeAt(playerNames.size - 1)
                         }
@@ -248,7 +246,7 @@ class GameSettingsActivity : BaseActivity() {
     }
 }
 
-    @Preview(showBackground = true)
+
 @Composable
 fun PreviewGameSettingsScreen() {
     GameSettingsActivity().GameSettingsScreen(

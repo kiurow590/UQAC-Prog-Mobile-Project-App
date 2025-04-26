@@ -1,8 +1,11 @@
 package com.example.uqac_progmob_project.games.werewolfGame
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings.Global.getString
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -29,6 +32,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
+import com.example.uqac_progmob_project.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,19 +47,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
 import com.example.uqac_progmob_project.gameChoose.FinalResult
 import kotlinx.coroutines.delay
+import java.util.Locale
 
-class WerewolfGame : BaseActivity() {
+class WerewolfGame : BaseActivity(), TextToSpeech.OnInitListener {
+    private var tts: TextToSpeech? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        tts = TextToSpeech(this, this)
 
         val gameSessionName = intent.getStringExtra("GAMESESSIONNAME") ?: ""
         val playerNames = intent.getStringArrayListExtra("PLAYERSESSIONNAME") ?: listOf()
@@ -65,18 +75,47 @@ class WerewolfGame : BaseActivity() {
         println("Player Names: $playerNames")
 
         setContent {
-            WerewolfGame(gameSessionName, playerNames)
+            WerewolfGame(gameSessionName, playerNames) { text ->
+                speakOut(text)
+            }
         }
+    }
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = tts!!.setLanguage(Locale.FRENCH)
+
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TextToSpeech", "Language not supported")
+            }
+        } else {
+            Log.e("TextToSpeech", "Initialization failed")
+        }
+    }
+
+    override fun onDestroy() {
+        if (tts != null) {
+            tts!!.stop()
+            tts!!.shutdown()
+        }
+
+        super.onDestroy()
+    }
+
+    fun speakOut(text: String) {
+        tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
     }
 }
 
 @Composable
 fun WerewolfGame(
     gameSessionName: String,
-    playerNames: List<String>
+    playerNames: List<String>,
+    speakOut: (String) -> Unit
 ) {
+    val context = LocalContext.current
     var gamePhase by remember { mutableStateOf("revealCards") }
-    val roles = remember { assignRoles(playerNames).toMutableMap() }
+    val roles = remember { assignRoles(context, playerNames).toMutableMap() }
     val eliminatedPlayers = remember { mutableStateListOf<String>() }
     val eliminatedPlayersDuringNight = remember { mutableStateListOf<String>() }
     var loverPair by remember { mutableStateOf<Pair<String, String>?>(null) }
@@ -88,15 +127,17 @@ fun WerewolfGame(
     var winnerMessage by remember { mutableStateOf("") }
     val playerScores = remember { mutableStateListOf(*List(playerNames.size) { 0 }.toTypedArray()) }
 
+    val werewolf = stringResource(id = R.string.bleiz_garou_role_werewolf)
+
     fun checkVictory() {
         val alivePlayers = playerNames - eliminatedPlayers
-        val werewolvesAlive = alivePlayers.count { roles[it] == "Loup-Garou" }
-        val villagersAlive = alivePlayers.count { roles[it] != "Loup-Garou" }
+        val werewolvesAlive = alivePlayers.count { roles[it] == werewolf }
+        val villagersAlive = alivePlayers.count { roles[it] != werewolf }
 
         if (loverPair != null) {
             val (lover1, lover2) = loverPair!!
             if (alivePlayers.containsAll(listOf(lover1, lover2)) && alivePlayers.size == 2) {
-                winnerMessage = "💖 Victoire des Amoureux !"
+                winnerMessage = context.getString(R.string.bleiz_garou_winner_message_lovers)
                 playerScores[playerNames.indexOf(lover1)] = 1
                 playerScores[playerNames.indexOf(lover2)] = 1
                 gamePhase = "results"
@@ -105,16 +146,16 @@ fun WerewolfGame(
         }
 
         if (werewolvesAlive > 0 && villagersAlive == 0) {
-            winnerMessage = "🐺 Victoire des Loups-Garous !"
-            playerNames.filter { roles[it] == "Loup-Garou" }.forEach {
+            winnerMessage = context.getString(R.string.bleiz_garou_winner_message_werewolves)
+            playerNames.filter { roles[it] == werewolf }.forEach {
                 playerScores[playerNames.indexOf(it)] = 1
             }
             gamePhase = "results"
         } else if (werewolvesAlive == 0) {
-            playerNames.filter { roles[it] != "Loup-Garou" }.forEach {
+            playerNames.filter { roles[it] != werewolf }.forEach {
                 playerScores[playerNames.indexOf(it)] = 1
             }
-            winnerMessage = "🏡 Victoire des Villageois !"
+            winnerMessage = context.getString(R.string.bleiz_garou_winner_message_villager)
             gamePhase = "results"
         }
     }
@@ -133,7 +174,7 @@ fun WerewolfGame(
                 playerNames.filterNot { it in eliminatedPlayers },
                 roles,
                 onThiefChoice = { chosenRole ->
-                    val thiefPlayer = playerNames.find { roles[it] == "Voleur" }
+                    val thiefPlayer = playerNames.find { roles[it] == context.getString(R.string.bleiz_garou_role_thief) }
                     if (thiefPlayer != null) {
                         roles[thiefPlayer] = chosenRole
                     }
@@ -250,7 +291,7 @@ fun WerewolfCardRevealed(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Passer le téléphone à $currentPlayer",
+            text = stringResource(id = R.string.bleiz_garou_pass_the_phone_to, currentPlayer),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
@@ -295,24 +336,141 @@ fun WerewolfCardRevealed(
                 }
             }
         }) {
-            Text(text = "Joueur suivant")
+            Text(text = stringResource(id = R.string.bleiz_garou_next_player))
         }
     }
 }
 
-fun assignRoles(playerNames: List<String>): Map<String, String> {
+fun assignRoles(context: Context, playerNames: List<String>): Map<String, String> {
     val playerCount = playerNames.size
 
     val roleDistribution = mapOf(
-        8 to listOf("Chasseur", "Loup-Garou", "Loup-Garou", "Petite Fille", "Villageois", "Villageois", "Sorcière", "Voyante"),
-        9 to listOf("Chasseur", "Cupidon", "Loup-Garou", "Loup-Garou", "Petite Fille", "Villageois", "Villageois", "Sorcière", "Voyante"),
-        10 to listOf("Chasseur", "Cupidon", "Loup-Garou", "Loup-Garou", "Petite Fille", "Villageois", "Villageois", "Sorcière", "Voyante", "Voleur"),
-        11 to listOf("Chasseur", "Cupidon", "Loup-Garou", "Loup-Garou", "Petite Fille", "Villageois", "Villageois", "Villageois", "Sorcière", "Voyante", "Voleur"),
-        12 to listOf("Chasseur", "Cupidon", "Loup-Garou", "Loup-Garou", "Loup-Garou", "Petite Fille", "Villageois", "Villageois", "Villageois", "Sorcière", "Voyante", "Voleur"),
-        13 to listOf("Chasseur", "Cupidon", "Loup-Garou", "Loup-Garou", "Loup-Garou", "Petite Fille", "Villageois", "Villageois", "Villageois", "Villageois", "Sorcière", "Voyante", "Voleur"),
-        14 to listOf("Chasseur", "Cupidon", "Loup-Garou", "Loup-Garou", "Loup-Garou", "Loup-Garou", "Petite Fille", "Villageois", "Villageois", "Villageois", "Villageois", "Sorcière", "Voyante", "Voleur"),
-        15 to listOf("Chasseur", "Cupidon", "Loup-Garou", "Loup-Garou", "Loup-Garou", "Loup-Garou", "Petite Fille", "Villageois", "Villageois", "Villageois", "Villageois", "Villageois", "Sorcière", "Voyante", "Voleur"),
-        16 to listOf("Chasseur", "Cupidon", "Loup-Garou", "Loup-Garou", "Loup-Garou", "Loup-Garou", "Petite Fille", "Villageois", "Villageois", "Villageois", "Villageois", "Villageois", "Villageois", "Sorcière", "Voyante", "Voleur")
+        8 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer)
+        ),
+        9 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer)
+        ),
+        10 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        11 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        12 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        13 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        14 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        15 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        16 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        )
     )
 
     val roles = roleDistribution[playerCount]?.shuffled() ?: return emptyMap()
@@ -334,39 +492,17 @@ fun WerewolfNightPhase(
     wolfVictim: String?,
     onGameStart: () -> Unit
 ) {
+    val context = LocalContext.current
     var currentStep by remember { mutableIntStateOf(0) }
 
-    val hasThief = roles.containsValue("Voleur")
-    val hasCupid = roles.containsValue("Cupidon")
-    val seerPlayer = playerNames.find { roles[it] == "Voyante" }
-    val witchPlayer = playerNames.find { roles[it] == "Sorcière" }
+    val hasThief = roles.containsValue(stringResource(id = R.string.bleiz_garou_role_thief))
+    val hasCupid = roles.containsValue(stringResource(id = R.string.bleiz_garou_role_cupid))
+    val seerPlayer = playerNames.find { roles[it] == stringResource(id = R.string.bleiz_garou_role_seer) }
+    val witchPlayer = playerNames.find { roles[it] == stringResource(id = R.string.bleiz_garou_role_witch) }
     val seerAlive = seerPlayer != null && seerPlayer in playerNames
     val witchAlive = witchPlayer != null && witchPlayer in playerNames
     val firstNight = nightCount == 1
 
-    val steps = listOf(
-        "🌙 ${nombreEnOrdinal(nightCount)} : Tout le monde ferme les yeux.",
-
-        "🃏 Le Voleur se réveille et voit les deux cartes cachées.", // step = 1
-        "😴 Le Voleur se rendort.",
-
-        "💘 Cupidon se réveille et choisit deux joueurs amoureux.", // step = 3
-        "😴 Cupidon se rendort.",
-
-        "🔮 La Voyante se réveille et regarde la carte d’un joueur.", // step = 5
-        "😴 La Voyante se rendort.",
-
-        "💏 Les Amoureux se réveillent et se reconnaissent.", // step = 7
-        "😴 Les Amoureux se rendorment.",
-
-        "🐺 Les Loups-Garous se réveillent et désignent une victime.", // step = 9
-        "😴 Les Loups-Garous se rendorment.",
-
-        "🧙‍♀️ La Sorcière se réveille et voit la victime des Loups-Garous.", // step = 11
-        "😴 La Sorcière se rendort.",
-
-        "🌄 Le Village se réveille et découvre la victime !" // step = 13
-    )
 
     fun nextStep() {
         do {
@@ -379,6 +515,12 @@ fun WerewolfNightPhase(
         )
     }
 
+    val currentLocale = LocalContext.current.resources.configuration.locales[0]
+    val steps = stringArrayResource(id = R.array.bleiz_garou_night_phase_step)
+        .map {
+            String.format(it, nombreEnOrdinal(nightCount, locale = currentLocale))
+        }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -386,7 +528,10 @@ fun WerewolfNightPhase(
     ) {
         when (currentStep) {
             1 -> {
-                val centerCards = listOf("Chasseur", "Loup-Garou") // Exemple
+                val centerCards = listOf(
+                    context.getString(R.string.bleiz_garou_role_hunter),
+                    context.getString(R.string.bleiz_garou_role_werewolf)
+                )
                 ThiefChoice(centerCards) { chosenRole ->
                     onThiefChoice(chosenRole)
                     nextStep()
@@ -423,7 +568,7 @@ fun WerewolfNightPhase(
 
             13 -> {
                 Button(onClick = { onGameStart() }) {
-                    Text("Commencer la journée")
+                    Text(context.getString(R.string.bleiz_garou_start_day))
                 }
             }
 
@@ -431,7 +576,7 @@ fun WerewolfNightPhase(
                 Text(text = steps[currentStep], fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(onClick = { nextStep() }) {
-                    Text("Suivant")
+                    Text(context.getString(R.string.bleiz_garou_next))
                 }
             }
         }
@@ -446,6 +591,7 @@ fun WerewolfDayPhase(
     onPlayerEliminated: (String?) -> Unit,
     onNightStart: () -> Unit
 ) {
+    val context = LocalContext.current
     var currentStep by remember { mutableIntStateOf(0) }
     var votedPlayers by remember { mutableStateOf<List<String>>(emptyList()) }
     var isRevote by remember { mutableStateOf(false) }
@@ -456,12 +602,7 @@ fun WerewolfDayPhase(
     val updatedPlayerNames = remember { playerNames.toMutableStateList() }
     val eliminatedPlayersDuringDay = remember { mutableStateListOf<String>() }
 
-    val steps = listOf(
-        "🌞 Le village se réveille",
-        "🗣 Débat sur les suspects",
-        "⚖️ Vote pour éliminer un joueur",
-        "⚠️ Résultats de la journée"
-    )
+    val steps = stringArrayResource(id = R.array.bleiz_garou_day_phase_step)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -498,7 +639,7 @@ fun WerewolfDayPhase(
 
             currentStep == 0 -> {
                 NightResults(eliminatedPlayers, roles) {
-                    if (eliminatedPlayers.any { roles[it] == "Chasseur" }) {
+                    if (eliminatedPlayers.any { roles[it] == context.getString(R.string.bleiz_garou_role_hunter) }) {
                         showHunterChoice = true
                     } else {
                         currentStep++
@@ -522,7 +663,7 @@ fun WerewolfDayPhase(
                         eliminatedPlayersDuringDay.add(eliminated)
                         votedPlayers = tiedPlayers
 
-                        if (roles[eliminated] == "Chasseur") {
+                        if (roles[eliminated] == context.getString(R.string.bleiz_garou_role_hunter)) {
                             showHunterChoice = true
                         } else {
                             currentStep++
@@ -555,18 +696,18 @@ fun NightResults(eliminatedPlayers: List<String>, roles: MutableMap<String, Stri
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Les victimes de la nuit sont :", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(id = R.string.bleiz_garou_night_results_victims_are), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
         if (eliminatedPlayers.isNotEmpty()) {
             eliminatedPlayers.forEach { player ->
                 Text("💀 $player - ${roles[player] ?: "Erreur"}", fontSize = 20.sp, color = Color.Red)
             }
         } else {
-            Text("🎉 Personne n'a été éliminé cette nuit !", fontSize = 18.sp, color = Color.Green)
+            Text(stringResource(id = R.string.bleiz_garou_night_results_no_victims), fontSize = 18.sp, color = Color.Green)
         }
 
         Button(onClick = onContinue) {
-            Text("Passer au débat")
+            Text(stringResource(id = R.string.bleiz_garou_night_results_go_debate))
         }
     }
 }
@@ -578,9 +719,9 @@ fun DebatePhase(onContinue: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text("Les joueurs discutent pour trouver les Loups-Garous...", fontSize = 18.sp)
+        Text(stringResource(id = R.string.bleiz_garou_debate_phase), fontSize = 18.sp)
         Button(onClick = onContinue) {
-            Text("Passer au vote")
+            Text(stringResource(id = R.string.bleiz_garou_debate_phase_go_vote))
         }
     }
 }
@@ -604,7 +745,7 @@ fun GameEndScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { onConfirm() }) {
-            Text("Continuer")
+            Text(stringResource(id = R.string.bleiz_garou_next))
         }
     }
 }
@@ -623,13 +764,15 @@ fun VotingPhase(
     val possibleVotes = if (tiedPlayers.isNotEmpty()) tiedPlayers else playerNames
 
     Column(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         if (currentVoter != null) {
             Text(
-                text = "📱 Passez le téléphone à $currentVoter pour voter",
+                text = stringResource(id = R.string.bleiz_garou_pass_the_phone_to, currentVoter),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -638,7 +781,9 @@ fun VotingPhase(
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -669,7 +814,7 @@ fun VotingPhase(
                         }
                     }
                 ) {
-                    Text("Confirmer le vote")
+                    Text(stringResource(id = R.string.bleiz_garou_voting_phase_confirm))
                 }
             }
         }
@@ -690,31 +835,31 @@ fun VoteResult(
     ) {
         if (eliminatedPlayer != null) {
             Text(
-                text = "🚨 $eliminatedPlayer a été éliminé !",
+                text = stringResource(id = R.string.bleiz_garou_vote_result, eliminatedPlayer),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Red
             )
             Text(
-                text = "Il était ${roles[eliminatedPlayer] ?: "Inconnu"}",
+                text = stringResource(id = R.string.bleiz_garou_vote_result_he_was, roles[eliminatedPlayer] ?: "Inconnu"),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.DarkGray
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = onNextPhase) {
-                Text("Passer à la nuit 🌙")
+                Text(stringResource(id = R.string.bleiz_garou_vote_result_go_to_night))
             }
         } else if (tiedPlayers.isNotEmpty()) {
             Text(
-                text = "⚖️ Égalité entre : ${tiedPlayers.joinToString(", ")}",
+                text = stringResource(id = R.string.bleiz_garou_vote_result_tied, tiedPlayers.joinToString(", ")),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Yellow
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Un revote est nécessaire pour les départager.",
+                text = stringResource(id = R.string.bleiz_garou_vote_result_revote_needed),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.Gray
@@ -724,19 +869,19 @@ fun VoteResult(
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Button(onClick = onRevote) {
-                    Text("Revoter 🗳️")
+                    Text(stringResource(id = R.string.bleiz_garou_vote_result_revote))
                 }
             }
         } else {
             Text(
-                text = "⚖️ Personne n'a été éliminé aujourd’hui !",
+                text = stringResource(id = R.string.bleiz_garou_vote_result_no_eliminated),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Green
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = onNextPhase) {
-                Text("Passer à la nuit 🌙")
+                Text(stringResource(id = R.string.bleiz_garou_vote_result_go_to_night))
             }
         }
     }
@@ -744,6 +889,7 @@ fun VoteResult(
 
 @Composable
 fun ThiefChoice(centerCards: List<String>, onChoiceMade: (String) -> Unit) {
+    val context = LocalContext.current
     var selectedCard by remember { mutableStateOf<String?>(null) }
     var hasConfirmed by remember { mutableStateOf(false) }
 
@@ -753,7 +899,7 @@ fun ThiefChoice(centerCards: List<String>, onChoiceMade: (String) -> Unit) {
         modifier = Modifier.fillMaxSize()
     ) {
         Text(
-            text = "🃏 Tu es le Voleur. Choisis une carte ou garde la tienne.",
+            text = stringResource(id = R.string.bleiz_garou_thief_choice),
             textAlign = TextAlign.Center,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -777,10 +923,10 @@ fun ThiefChoice(centerCards: List<String>, onChoiceMade: (String) -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         SelectableCard(
-            "Garder ma carte (Villageois)",
-            selectedCard == "Villageois",
+            stringResource(id = R.string.bleiz_garou_thief_choice_keep_card),
+            selectedCard == stringResource(id = R.string.bleiz_garou_role_villager),
             selectedBorderColor = Color.Green,
-            onClick = { selectedCard = "Villageois" },
+            onClick = { selectedCard = context.getString(R.string.bleiz_garou_role_villager)},
             modifier = Modifier.fillMaxWidth(0.4f)
         )
 
@@ -789,7 +935,7 @@ fun ThiefChoice(centerCards: List<String>, onChoiceMade: (String) -> Unit) {
         // Bouton de confirmation (apparaît uniquement après un choix)
         if (selectedCard != null && !hasConfirmed) {
             Button(onClick = { onChoiceMade(selectedCard!!); hasConfirmed = true }) {
-                Text("Confirmer le choix")
+                Text(stringResource(id = R.string.bleiz_garou_thief_choice_confirm))
             }
         }
     }
@@ -807,7 +953,7 @@ fun CupidChoice(playerNames: List<String>, onLoversChosen: (String, String) -> U
             .padding(16.dp)
     ) {
         Text(
-            text = "💘 Cupidon, choisis deux joueurs à rendre amoureux.",
+            text = stringResource(id = R.string.bleiz_garou_cupid_choice),
             textAlign = TextAlign.Center,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -816,7 +962,9 @@ fun CupidChoice(playerNames: List<String>, onLoversChosen: (String, String) -> U
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -845,7 +993,7 @@ fun CupidChoice(playerNames: List<String>, onLoversChosen: (String, String) -> U
 
         if (lovers.size == 2) {
             Button(onClick = { onLoversChosen(lovers[0], lovers[1]) }) {
-                Text("Confirmer le couple")
+                Text(stringResource(id = R.string.bleiz_garou_cupid_choice_confirm))
             }
         }
     }
@@ -863,7 +1011,7 @@ fun WerewolvesChoice(playerNames: List<String>, onVictimChosen: (String) -> Unit
             .padding(16.dp)
     ) {
         Text(
-            "🐺 Les Loups-Garous choisissent une victime.",
+            stringResource(id = R.string.bleiz_garou_werewolves_choice),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -873,7 +1021,9 @@ fun WerewolvesChoice(playerNames: List<String>, onVictimChosen: (String) -> Unit
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -893,7 +1043,7 @@ fun WerewolvesChoice(playerNames: List<String>, onVictimChosen: (String) -> Unit
 
         if (selectedVictim != null) {
             Button(onClick = { onVictimChosen(selectedVictim!!) }) {
-                Text("Confirmer la victime")
+                Text(stringResource(id = R.string.bleiz_garou_werewolves_choice_confirm))
             }
         }
     }
@@ -916,13 +1066,13 @@ fun WitchChoice(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text("🧙‍♀️ Sorcière, veux-tu utiliser une potion ?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(id = R.string.bleiz_garou_witch_choice), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Affichage de la victime des Loups-Garous
         if (wolfVictim != null) {
-            Text("❗ $wolfVictim a été attaqué cette nuit !", fontSize = 16.sp, color = Color.Red)
+            Text(stringResource(id = R.string.bleiz_garou_witch_choice_attacked_player, wolfVictim), fontSize = 16.sp, color = Color.Red)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -932,37 +1082,39 @@ fun WitchChoice(
             Column {
                 if (potionsAvailable.first && wolfVictim != null) {
                     Button(onClick = { selectedAction = "heal" }) {
-                        Text("💊 Utiliser la potion de vie sur $wolfVictim")
+                        Text(stringResource(id = R.string.bleiz_garou_witch_choice_use_heal, wolfVictim))
                     }
                 } else if (!potionsAvailable.first) {
-                    Text("🚫 Potion de vie déjà utilisée", fontSize = 14.sp, color = Color.Gray)
+                    Text(stringResource(id = R.string.bleiz_garou_witch_choice_already_used_heal), fontSize = 14.sp, color = Color.Gray)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 if (potionsAvailable.second) {
                     Button(onClick = { selectedAction = "poison" }) {
-                        Text("☠️ Utiliser la potion de mort")
+                        Text(stringResource(id = R.string.bleiz_garou_witch_choice_use_poison))
                     }
                 } else {
-                    Text("🚫 Potion de mort déjà utilisée", fontSize = 14.sp, color = Color.Gray)
+                    Text(stringResource(id = R.string.bleiz_garou_witch_choice_already_used_poison), fontSize = 14.sp, color = Color.Gray)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Button(onClick = { onWitchAction(false, false, null) }) {
-                    Text("🚫 Ne rien faire")
+                    Text(stringResource(id = R.string.bleiz_garou_witch_choice_do_nothing))
                 }
             }
         }
 
         // Si elle choisit la potion de mort, affichage des joueurs
         if (selectedAction == "poison") {
-            Text("Choisis un joueur à éliminer :", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(id = R.string.bleiz_garou_witch_choice_choose_player), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -982,7 +1134,7 @@ fun WitchChoice(
 
             if (poisonTarget != null) {
                 Button(onClick = { onWitchAction(false, true, poisonTarget) }) {
-                    Text("Confirmer l'élimination de $poisonTarget")
+                    Text(stringResource(id = R.string.bleiz_garou_witch_choice_confirm_kill, poisonTarget!!))
                 }
             }
         }
@@ -991,7 +1143,7 @@ fun WitchChoice(
         if (selectedAction == "heal") {
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = { onWitchAction(true, false, null) }) {
-                Text("Confirmer le sauvetage de $wolfVictim")
+                Text(stringResource(id = R.string.bleiz_garou_witch_choice_confirm_heal, wolfVictim!!))
             }
         }
     }
@@ -1009,14 +1161,16 @@ fun SeerChoice(playerNames: List<String>, roles: Map<String, String>, onCardReve
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text("🔮 Voyante, choisis un joueur à observer.", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(id = R.string.bleiz_garou_seer_choice), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // add spacing to grid items
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -1040,12 +1194,12 @@ fun SeerChoice(playerNames: List<String>, roles: Map<String, String>, onCardReve
         Spacer(modifier = Modifier.height(16.dp))
 
         if (revealedRole != null && selectedPlayer != null) {
-            Text("🔮 Carte de $selectedPlayer : $revealedRole", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(id = R.string.bleiz_garou_seer_choice_reveal, selectedPlayer!!, revealedRole!!), fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(onClick = { onCardRevealed(selectedPlayer!!, revealedRole!!) }) {
-                Text("Continuer")
+                Text(stringResource(id = R.string.bleiz_garou_next))
             }
         }
     }
@@ -1058,12 +1212,17 @@ fun HunterChoice(
 ) {
     var selectedPlayer by remember { mutableStateOf<String?>(null) }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("🎯 Le Chasseur doit éliminer un joueur", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(stringResource(id = R.string.bleiz_garou_hunter_choice), fontSize = 22.sp, fontWeight = FontWeight.Bold)
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -1083,7 +1242,7 @@ fun HunterChoice(
             onClick = { onPlayerChosen(selectedPlayer!!) },
             enabled = selectedPlayer != null
         ) {
-            Text("Confirmer l'élimination")
+            Text(stringResource(id = R.string.bleiz_garou_hunter_choice_confirm))
         }
     }
 }
@@ -1100,21 +1259,21 @@ fun HunterKillResult(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "🔫 Le Chasseur a tué : $hunterTarget",
+            text = stringResource(id = R.string.bleiz_garou_hunter_kill, hunterTarget),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Red
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "🎭 Son rôle était : $role",
+            text = stringResource(id = R.string.bleiz_garou_hunter_kill_he_was, role),
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
             color = Color.DarkGray
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onConfirm) {
-            Text("Continuer ⏩")
+            Text(stringResource(id = R.string.bleiz_garou_next))
         }
     }
 }
@@ -1153,25 +1312,42 @@ fun SelectableCard(
     }
 }
 
-fun nombreEnOrdinal(n: Int, feminin: Boolean = true): String {
-    val ordinaux = mapOf(
-        1 to if (feminin) "Première" else "Premier",
-        2 to "Deuxième",
-        3 to "Troisième",
-        4 to "Quatrième",
-        5 to "Cinquième",
-        6 to "Sixième",
-        7 to "Septième",
-        8 to "Huitième",
-        9 to "Neuvième",
-        10 to "Dixième"
-    )
+fun nombreEnOrdinal(n: Int, feminin: Boolean = true, locale: Locale = Locale.FRENCH): String {
+    return when (locale) {
+        Locale.FRENCH -> {
+            val ordinaux = mapOf(
+                1 to if (feminin) "Première" else "Premier",
+                2 to "Deuxième",
+                3 to "Troisième",
+                4 to "Quatrième",
+                5 to "Cinquième",
+                6 to "Sixième",
+                7 to "Septième",
+                8 to "Huitième",
+                9 to "Neuvième",
+                10 to "Dixième"
+            )
 
-    if (n in ordinaux) return ordinaux[n]!!
+            if (n in ordinaux) return ordinaux[n]!!
 
-    return when {
-        n % 10 == 1 && n != 11 -> "${nombreEnLettres(n - 1)}-et-unième"
-        else -> "${nombreEnLettres(n)}ième"
+            when {
+                n % 10 == 1 && n != 11 -> "${nombreEnLettres(n - 1)}-et-unième"
+                else -> "${nombreEnLettres(n)}ième"
+            }
+        }
+
+        Locale.ENGLISH -> {
+            val suffix = when {
+                n % 100 in 11..13 -> "th"
+                n % 10 == 1 -> "st"
+                n % 10 == 2 -> "nd"
+                n % 10 == 3 -> "rd"
+                else -> "th"
+            }
+            "$n$suffix"
+        }
+
+        else -> throw IllegalArgumentException("Unsupported locale")
     }
 }
 
