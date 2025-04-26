@@ -365,8 +365,112 @@ fun assignRoles(context: Context, playerNames: List<String>): Map<String, String
             context.getString(R.string.bleiz_garou_role_villager),
             context.getString(R.string.bleiz_garou_role_witch),
             context.getString(R.string.bleiz_garou_role_seer)
+        ),
+        10 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        11 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        12 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        13 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        14 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        15 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
+        ),
+        16 to listOf(
+            context.getString(R.string.bleiz_garou_role_hunter),
+            context.getString(R.string.bleiz_garou_role_cupid),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_werewolf),
+            context.getString(R.string.bleiz_garou_role_little_girl),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_villager),
+            context.getString(R.string.bleiz_garou_role_witch),
+            context.getString(R.string.bleiz_garou_role_seer),
+            context.getString(R.string.bleiz_garou_role_thief)
         )
-        // Ajoutez les autres distributions ici...
     )
 
     val roles = roleDistribution[playerCount]?.shuffled() ?: return emptyMap()
@@ -660,7 +764,9 @@ fun VotingPhase(
     val possibleVotes = if (tiedPlayers.isNotEmpty()) tiedPlayers else playerNames
 
     Column(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -675,7 +781,9 @@ fun VotingPhase(
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -854,7 +962,9 @@ fun CupidChoice(playerNames: List<String>, onLoversChosen: (String, String) -> U
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -911,7 +1021,9 @@ fun WerewolvesChoice(playerNames: List<String>, onVictimChosen: (String) -> Unit
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -1000,7 +1112,9 @@ fun WitchChoice(
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -1054,7 +1168,9 @@ fun SeerChoice(playerNames: List<String>, roles: Map<String, String>, onCardReve
         // add spacing to grid items
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -1096,12 +1212,17 @@ fun HunterChoice(
 ) {
     var selectedPlayer by remember { mutableStateOf<String?>(null) }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(stringResource(id = R.string.bleiz_garou_hunter_choice), fontSize = 22.sp, fontWeight = FontWeight.Bold)
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
