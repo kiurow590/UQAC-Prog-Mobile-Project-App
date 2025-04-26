@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.uqac_progmob_project.BaseActivity
@@ -104,9 +105,13 @@ class GameSettingsActivity : BaseActivity() {
         onBackClick: () -> Unit,
         onPlayClick: (String, List<String>) -> Unit
     ) {
+        val minPlayers = if (gameName == stringResource(id = R.string.bleiz_garou)) 8 else 2
+
         var gameSessionName by remember { mutableStateOf("") }
-        var numberOfPlayers by remember { mutableIntStateOf(2) }
-        val playerNames = remember { mutableStateListOf("", "") }
+        var numberOfPlayers by remember { mutableIntStateOf(minPlayers) }
+        val playerNames = remember { mutableStateListOf<String>().apply {
+            repeat(minPlayers) { add("") }
+        } }
 
         Column(
             modifier = Modifier
@@ -143,7 +148,7 @@ class GameSettingsActivity : BaseActivity() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(onClick = {
-                    if (numberOfPlayers > 2) {
+                    if (numberOfPlayers > minPlayers) {
                         numberOfPlayers--
                         playerNames.removeAt(playerNames.size - 1)
                     }

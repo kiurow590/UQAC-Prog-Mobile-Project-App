@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -78,7 +79,11 @@ fun GameDetailScreen(
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = gameDescription, fontSize = 16.sp)
+        Text(
+            text = gameDescription,
+            style = MaterialTheme.typography.bodyMedium,
+            fontSize = 16.sp
+        )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = onPlayClick,
