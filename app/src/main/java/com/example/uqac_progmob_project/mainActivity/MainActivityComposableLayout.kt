@@ -55,7 +55,7 @@ fun MainScreen() {
         val (image, greenButton, grayButton, quitButton, settingsButton) = createRefs()
 
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            painter = painterResource(id = R.drawable.taverne_au_jeux),
             contentDescription = stringResource(id = R.string.main_image_description),
             modifier = Modifier
                 .size(200.dp)
@@ -68,7 +68,7 @@ fun MainScreen() {
 
         Button(
             onClick = {
-                Toast.makeText(context, "Bouton Vert cliqué !", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(context, "Bouton Vert cliqué !", Toast.LENGTH_SHORT).show()
                 val intent = Intent(context, GameChoose::class.java)
                 context.startActivity(intent)
             },
@@ -114,9 +114,10 @@ fun MainScreen() {
         IconButton(
             onClick = { showDialog = true },
             modifier = Modifier
+                .size(45.dp) // Augmente la taille du bouton
                 .constrainAs(settingsButton) {
-                    bottom.linkTo(parent.bottom, margin = 16.dp)
-                    end.linkTo(parent.end)
+                    top.linkTo(parent.top, margin = 20.dp)
+                    end.linkTo(parent.end, margin = 20.dp)
                 }
         ) {
             Icon(
