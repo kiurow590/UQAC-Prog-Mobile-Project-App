@@ -13,7 +13,7 @@
     <string name="select_language">Selection Langue</string>
     <string name="volume_level">Niveau de son</string>
     <string name="triMannGame">Tri Mann</string>
-    <string name="triMannGameDescription">Description du jeu Trimann</string>
+    <string name="triMannGameDescription">Tri-mann est un jeu de dés où les joueurs s\'affrontent en lançant un ensemble de dés et en tentant d\'obtenir des combinaisons spécifiques pour marquer des points. Chaque joueur dispose d\'un nombre limité de lancers et doit choisir stratégiquement quelles faces de dés garder pour maximiser son score. Le jeu demande à la fois de la chance et de la réflexion pour optimiser les choix à chaque tour.</string>
     <string name="bleiz_garou">Bleiz-garou</string>
     <string name="bleiz_garou_Description">Description du jeu Bleiz Garou</string>
     <string name="course_e_pic">Course e pic</string>
@@ -29,6 +29,31 @@
     <string name="history_game">Historique de jeux</string>
     <string name="language">Langue</string>
     <string name="gamechoose">Choix du jeu</string>
+    <!-- TriMann Game Strings -->
+    <string name="game_started">Jeu démarré</string>
+    <string name="roll_dice">Lancer les dés</string>
+    <string name="dice_result">Résultat des dés: %d</string>
+    <string name="triman_player">Triman: %s</string>
+    <string name="player_turn">Tour de %s</string>
+    <string name="player_score">%s : %d</string>
+    <string name="start_game">Démarrer le jeu</string>
+    <string name="end_game">Terminer le jeu</string>
+    <string name="player_list">Liste des joueurs:</string>
+    <string name="validate_distribution">Valider la distribution</string>
+    <string name="designate">Désigner</string>
+    <string name="shifoumi_players">Joueurs sélectionnés pour le shifoumi : %s</string>
+    <string name="designate_loser">Désigner le perdant</string>
+
+    <!-- Roll Result Messages -->
+    <string name="double_even_roll">%s a lancé un double %d, il distribue alors %d points!</string>
+    <string name="tri_result">Tri ! %s gagne 2 points</string>
+    <string name="previous_player_points">%s gagne 2 points</string>
+    <string name="next_player_points">%s gagne 2 points</string>
+    <string name="double_odd_roll">%s gagne %d points (double impair) !</string>
+    <string name="double_six">Double 6, choisissez deux joueurs pour le chifoumi !</string>
+    <string name="place_fingers">Posez %d doigts sur la table</string>
+    <string name="turn_ended">Le tour de %s est terminé, aucun évènement n\'a eu lieu.</string>
+
     <string name="web_client_id">487223276550-1mfc4i8gcee1t3f1s6pvg4p4cqu34kh5.apps.googleusercontent.com</string>
 
 </resources>
