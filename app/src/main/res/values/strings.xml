@@ -16,7 +16,7 @@
     <string name="course_e_pic">Course e pic</string>
     <string name="course_e_pic_description">Course E-Pic Game Description</string>
     <string name="et_boom">Et Boom!</string>
-    <string name="et_boom_description">Et Boom Game Description</string>
+    <string name="et_boom_description">In Et Boom!, each player must say a word starting with a given letter before the bomb explodes. Think fast and speak clearly, or you\'ll lose time and the tension will rise! The last remaining player wins the game.</string>
     <string name="quit">Quit</string>
     <string name="game_rules">Game Rules</string>
     <string name="settings">Settings</string>

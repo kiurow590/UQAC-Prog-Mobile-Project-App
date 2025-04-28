@@ -27,11 +27,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
+import com.example.uqac_progmob_project.BaseActivity
 import com.example.uqac_progmob_project.settings.SettingsDialog
 import com.google.firebase.auth.FirebaseAuth
 
 
-class GameChoose : AppCompatActivity() {
+class GameChoose : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
