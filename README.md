@@ -1,5 +1,3 @@
-Voici un **README** professionnel adapté à ton projet :  
-
 ---
 
 # 🎲 La Taverne au Jeu
@@ -115,6 +113,5 @@ Licence à préciser selon diffusion.
 
 # Vidéo Compilation
 
-<video src="assets/demo.webm" width="600" autoplay loop muted playsinline defaultPlaybackRate="5.0">
-  Votre navigateur ne supporte pas la vidéo.
-</video>
+https://github.com/user-attachments/assets/07491da3-b742-49c7-88bc-ace2d20a8447
+
