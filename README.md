@@ -107,7 +107,6 @@ Bienvenue dans **La Taverne au Jeu**, une application mobile Android de mini-jeu
 ## 📜 Licence
 
 Projet développé dans le cadre de **Programmation Mobile UQAC** — Usage académique.  
-Licence à préciser selon diffusion.
 
 ---
 
