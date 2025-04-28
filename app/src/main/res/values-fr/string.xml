@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">UQAC-ProgMob-Projet</string>
     <string name="main_image_description">image principale</string>
     <string name="green_button_text">Jeu pour un téléphone</string>
@@ -13,9 +13,7 @@
     <string name="select_language">Selection Langue</string>
     <string name="volume_level">Niveau de son</string>
     <string name="triMannGame">Tri Mann</string>
-    <string name="triMannGameDescription">Description du jeu Trimann</string>
-    <string name="bleiz_garou">Bleiz-garou</string>
-    <string name="bleiz_garou_Description">Description du jeu Bleiz Garou</string>
+    <string name="triMannGameDescription">Tri-mann est un jeu de dés où les joueurs s\'affrontent en lançant un ensemble de dés et en essayant d\'obtenir des combinaisons spécifiques pour marquer des points. Chaque joueur dispose d\'un nombre limité de lancers et doit décider stratégiquement quelles faces de dés conserver afin de maximiser son score. Le jeu nécessite à la fois de la chance et de la réflexion stratégique pour optimiser ses décisions à chaque tour.</string>
     <string name="course_e_pic">Course e pic</string>
     <string name="course_e_pic_description">Description du jeu Course E-Pic</string>
     <string name="et_boom">Et Boom!</string>
