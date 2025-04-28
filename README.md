@@ -115,6 +115,6 @@ Licence à préciser selon diffusion.
 
 # Vidéo Compilation
 
-<video src="assets/demo.webm" width="600" autoplay loop muted playsinline>
+<video src="assets/demo.webm" width="600" autoplay loop muted playsinline defaultPlaybackRate="5.0">
   Votre navigateur ne supporte pas la vidéo.
 </video>
