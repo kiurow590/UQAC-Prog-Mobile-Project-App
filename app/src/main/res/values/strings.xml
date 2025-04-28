@@ -12,11 +12,11 @@
     <string name="select_language">Select Language</string>
     <string name="volume_level">Volume Level</string>
     <string name="triMannGame">Tri Mann</string>
-    <string name="triMannGameDescription"> Tri Mann Game Description</string>
+    <string name="triMannGameDescription">Tri-mann is a dice game where players compete by rolling a set of dice and trying to get specific combinations to score points. Each player has a limited number of rolls and must strategically decide which dice faces to keep to maximize their score. The game requires both luck and strategic thinking to optimize decisions each turn.</string>
     <string name="course_e_pic">Course e pic</string>
     <string name="course_e_pic_description">Course E-Pic Game Description</string>
     <string name="et_boom">Et Boom!</string>
-    <string name="et_boom_description">In this game, you and your friends find a bomb that will inevitably explode. The goal is to be the survivor by saying words that start with the indicated letter.</string>
+    <string name="et_boom_description">Et Boom Game Description</string>
     <string name="quit">Quit</string>
     <string name="game_rules">Game Rules</string>
     <string name="settings">Settings</string>
@@ -26,6 +26,30 @@
     <string name="history_game">History Game</string>
     <string name="language">Language</string>
     <string name="gamechoose">Choose Game</string>
+    <!-- TriMann Game Strings -->
+    <string name="game_started">Game started</string>
+    <string name="roll_dice">Roll dice</string>
+    <string name="dice_result">Dice result: %d</string>
+    <string name="triman_player">Triman: %s</string>
+    <string name="player_turn">%s\'s turn</string>
+    <string name="player_score">%s: %d</string>
+    <string name="start_game">Start game</string>
+    <string name="end_game">End game</string>
+    <string name="player_list">Player list:</string>
+    <string name="validate_distribution">Validate distribution</string>
+    <string name="designate">Designate</string>
+    <string name="shifoumi_players">Players selected for shifoumi: %s</string>
+    <string name="designate_loser">Designate loser</string>
+
+    <!-- Roll Result Messages -->
+    <string name="double_even_roll">%s rolled a double %d, they distribute %d points!</string>
+    <string name="tri_result">Tri! %s gets 2 points</string>
+    <string name="previous_player_points">%s gets 2 points</string>
+    <string name="next_player_points">%s gets 2 points</string>
+    <string name="double_odd_roll">%s gets %d points (odd double)!</string>
+    <string name="double_six">Double 6, choose two players for shifoumi!</string>
+    <string name="place_fingers">Place %d fingers on the table</string>
+    <string name="turn_ended">%s\'s turn is over, no event occurred.</string>
     <string name="web_client_id">487223276550-1mfc4i8gcee1t3f1s6pvg4p4cqu34kh5.apps.googleusercontent.com</string>
     <string name="volume">Volume</string>
 
