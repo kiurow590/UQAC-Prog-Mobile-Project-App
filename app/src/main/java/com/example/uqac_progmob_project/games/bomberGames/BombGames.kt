@@ -56,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 
 import android.util.Log
+import androidx.compose.ui.res.stringResource
 import com.example.uqac_progmob_project.BaseActivity
 import com.example.uqac_progmob_project.gameChoose.FinalResult
 import kotlinx.coroutines.delay
@@ -117,13 +118,19 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
             playerScores[playerIndices[currentPlayerIndex]] = eliminationOrder--
             players.removeAt(currentPlayerIndex)
             playerIndices.removeAt(currentPlayerIndex)
-            Log.d("BombGamesScreen", "Player eliminated: $eliminatedPlayer, new playerScores: $playerScores, new eliminationOrder: $eliminationOrder")
+            Log.d(
+                "BombGamesScreen",
+                "Player eliminated: $eliminatedPlayer, new playerScores: $playerScores, new eliminationOrder: $eliminationOrder"
+            )
             if (players.size > 1) {
                 currentPlayerIndex = (0 until players.size).random()
                 timerValue = (30..60).random()
                 countdownValue = 10
                 gameStarted = false
-                Log.d("BombGamesScreen", "New currentPlayerIndex: $currentPlayerIndex, new timerValue: $timerValue, new countdownValue: $countdownValue")
+                Log.d(
+                    "BombGamesScreen",
+                    "New currentPlayerIndex: $currentPlayerIndex, new timerValue: $timerValue, new countdownValue: $countdownValue"
+                )
             }
         }
     }
@@ -154,27 +161,33 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
 
     // Vérification initiale de la permission
     LaunchedEffect(Unit) {
-        isPermissionGranted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-        Log.d("BombGamesScreen", "Initial permission check, isPermissionGranted: $isPermissionGranted")
+        isPermissionGranted = ContextCompat.checkSelfPermission(
+            context,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+        Log.d(
+            "BombGamesScreen",
+            "Initial permission check, isPermissionGranted: $isPermissionGranted"
+        )
     }
 
     // Si la permission est refusée, on affiche une boîte de dialogue explicative
     if (showPermissionRationale) {
         AlertDialog(
             onDismissRequest = { showPermissionRationale = false },
-            title = { Text("Permission requise") },
-            text = { Text("Ce jeu utilise la reconnaissance vocale. Autorisez l'accès au micro pour jouer.") },
+            text = { Text(stringResource(id = R.string.permission_required_message)) },
+            title = { Text(stringResource(id = R.string.permission_required_title)) },
             confirmButton = {
                 Button(onClick = {
                     showPermissionRationale = false
                     permissionLauncher.launch(permission)
                 }) {
-                    Text("Autoriser")
+                    Text(stringResource(id = R.string.allow))
                 }
             },
             dismissButton = {
                 Button(onClick = { showPermissionRationale = false }) {
-                    Text("Annuler")
+                    Text(stringResource(id = R.string.cancel))
                 }
             }
         )
@@ -197,12 +210,19 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
                 verticalArrangement = Arrangement.Center
             ) {
                 if (eliminatedPlayer != null) {
-                    Text("Joueur éliminé : $eliminatedPlayer", fontSize = 24.sp, color = Color.Red)
+                    Text(
+                        stringResource(id = R.string.eliminated_player, eliminatedPlayer!!),
+                        fontSize = 24.sp,
+                        color = Color.Red
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                Text("Le joueur qui commence est : ${players[currentPlayerIndex]}", fontSize = 24.sp)
+                Text(
+                    stringResource(id = R.string.starting_player, players[currentPlayerIndex]),
+                    fontSize = 24.sp
+                )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Début du jeu dans : $countdownValue secondes", fontSize = 24.sp)
+                Text(stringResource(id = R.string.game_starts_in, countdownValue), fontSize = 24.sp)
             }
         } else {
             GameUI(gameSessionName, players, timerValue, ::deductTime, currentPlayerIndex) {
@@ -216,7 +236,11 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("Ce jeu a besoin du micro pour fonctionner.", fontSize = 18.sp, color = Color.Red)
+            Text(
+                stringResource(id = R.string.permission_required_message),
+                fontSize = 18.sp,
+                color = Color.Red
+            )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, permission)) {
@@ -225,7 +249,7 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
                     permissionLauncher.launch(permission)
                 }
             }) {
-                Text("Demander l'autorisation")
+                Text(stringResource(id = R.string.request_permission))
             }
         }
     }
@@ -235,7 +259,10 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
 @Composable
 fun EndGame(gameSessionName: String, playerNames: List<String>, playerScores: List<Int>) {
     val context = LocalContext.current
-    Log.d("BombGamesScreen", "Ending game, gameSessionName: $gameSessionName, playerNames: $playerNames, playerScores: $playerScores")
+    Log.d(
+        "BombGamesScreen",
+        "Ending game, gameSessionName: $gameSessionName, playerNames: $playerNames, playerScores: $playerScores"
+    )
     Log.d("BombGamesScreen", "Navigating to FinalResult screen")
     val intent = Intent(context, FinalResult::class.java).apply {
         putExtra("GAMESESSIONNAME", gameSessionName)
@@ -268,10 +295,10 @@ fun GameUI(
                 recognizedText = text
                 feedback = if (text.startsWith(randomChar, ignoreCase = true)) {
                     onNextPlayer()
-                    "✅ Correct !"
+                    context.getString(R.string.correct_word) // Utilisation de context.getString()
                 } else {
                     deductTime()
-                    "❌ Mauvais mot, essaye encore !"
+                    context.getString(R.string.wrong_word) // Utilisation de context.getString()
                 }
             },
             onError = { error ->
@@ -281,7 +308,9 @@ fun GameUI(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TopBar(gameSessionName)
@@ -291,13 +320,15 @@ fun GameUI(
         AnimatedBomb(timerValue)
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Trouve un mot commençant par : $randomChar", fontSize = 24.sp)
+        Text(stringResource(id = R.string.find_word_starting_with, randomChar), fontSize = 24.sp)
 
         Button(onClick = { speechRecognizerHelper.startListening() }) {
-            Text(text = "🎤 Parler")
+            Text(
+                stringResource(id = R.string.speak)
+            )
         }
 
-        Text(text = "Vous avez dit : $recognizedText", fontSize = 18.sp)
+        Text(stringResource(id = R.string.you_said, recognizedText), fontSize = 18.sp)
 
         Text(
             text = feedback,
@@ -307,8 +338,6 @@ fun GameUI(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Display the countdown timer
-        // Text(text = "Temps restant : $timerValue secondes", fontSize = 18.sp, color = Color.Black)
     }
 
     DisposableEffect(Unit) {
@@ -353,6 +382,7 @@ fun PlayerBubbles(playerNames: List<String>, currentPlayerIndex: Int) {
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(gameSessionName: String) {
@@ -371,9 +401,6 @@ fun AnimatedBomb(timerValue: Int) {
     val maxDuration = 500 // Maximum duration for the animation
     val minDuration = 100 // Minimum duration for the animation
     val duration = ((timerValue / 60f) * (maxDuration - minDuration) + minDuration).toInt()
-
-    // Log the duration value
-    //Log.d("AnimatedBomb", "Animation duration: $duration ms")
 
     val infiniteTransition = rememberInfiniteTransition()
     val scale by infiniteTransition.animateFloat(

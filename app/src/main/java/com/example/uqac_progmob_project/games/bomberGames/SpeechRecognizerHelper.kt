@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import com.example.uqac_progmob_project.LanguageManager
 
 class SpeechRecognizerHelper(
     private val context: Context,
@@ -42,7 +43,13 @@ class SpeechRecognizerHelper(
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fr-FR") // Langue française
+            val language = LanguageManager.getLanguage(context) // Récupère la langue actuelle de l'application
+            if (language.isNotEmpty() && language != "en") {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fr-FR") // Définit la langue de reconnaissance
+            } else {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US") // Définit la langue par défaut
+            }
+
         }
 
         speechRecognizer?.startListening(intent)

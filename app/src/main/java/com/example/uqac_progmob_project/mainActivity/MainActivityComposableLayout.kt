@@ -178,7 +178,7 @@ fun SignInScreen(onSignInClick: () -> Unit) {
             onClick = onSignInClick,
             modifier = Modifier.padding(16.dp)
         ) {
-            Text("Se connecter avec Google")
+            Text(stringResource(id = R.string.connectGoogle))
         }
     }
 }

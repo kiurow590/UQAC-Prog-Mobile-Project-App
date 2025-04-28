@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">UQAC-ProgMob-Project</string>
+    <string name="app_name">La taverne au jeu</string>
     <string name="main_image_description">main image</string>
     <string name="green_button_text">One Phone Game</string>
     <string name="gray_button_text">Multi Phone Game</string>
@@ -131,4 +131,24 @@
     <string name="bleiz_garou_hunter_choice_confirm">Confirm Elimination</string>
     <string name="bleiz_garou_hunter_kill">🔫 The Hunter has killed: %1$s</string>
     <string name="bleiz_garou_hunter_kill_he_was">🎭 Their role was: %1$s</string>
+
+    <string name="connectGoogle"> Connect to Google </string>
+
+
+    <string name="permission_required_title">Permission Required</string>
+    <string name="permission_required_message">This game requires microphone permission to function.</string>
+    <string name="allow">Granted</string>
+    <string name="cancel">Cancel</string>
+    <string name="game_needs_microphone">This game needs microphone permission to function.</string>
+    <string name="request_permission">Ask for permission</string>
+    <string name="eliminated_player">Player %1$s has been eliminated!</string>
+    <string name="starting_player">"Starting player: %1$s</string>
+    <string name="game_starts_in">"Game starts in %1$d seconds</string>
+    <string name="find_word_starting_with">Find a word starting with the letter %1$s</string>
+    <string name="you_said">You said: %1$s</string>
+    <string name="correct_word">✅ Correct word!</string>
+    <string name="wrong_word">❌ Wrong word! Try again.</string>
+    <string name="speak"> 🎤  Speak</string>
+
+
 </resources>
