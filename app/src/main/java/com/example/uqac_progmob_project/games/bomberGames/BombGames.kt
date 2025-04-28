@@ -97,20 +97,6 @@ fun BombGamesScreen(gameSessionName: String, playerNames: List<String>) {
     var eliminationOrder by remember { mutableIntStateOf(playerNames.size - 1) }
     var playerIndices by remember { mutableStateOf((playerNames.indices).toMutableList()) }
 
-    Log.d("BombGamesScreen", "gameSessionName: $gameSessionName")
-    Log.d("BombGamesScreen", "playerNames: $playerNames")
-    Log.d("BombGamesScreen", "isPermissionGranted: $isPermissionGranted")
-    Log.d("BombGamesScreen", "showPermissionRationale: $showPermissionRationale")
-    Log.d("BombGamesScreen", "timerValue: $timerValue")
-    Log.d("BombGamesScreen", "gameStarted: $gameStarted")
-    Log.d("BombGamesScreen", "countdownValue: $countdownValue")
-    Log.d("BombGamesScreen", "currentPlayerIndex: $currentPlayerIndex")
-    Log.d("BombGamesScreen", "players: $players")
-    Log.d("BombGamesScreen", "eliminatedPlayer: $eliminatedPlayer")
-    Log.d("BombGamesScreen", "playerScores: $playerScores")
-    Log.d("BombGamesScreen", "eliminationOrder: $eliminationOrder")
-    Log.d("BombGamesScreen", "playerIndices: $playerIndices")
-
     val permissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             isPermissionGranted = isGranted
@@ -322,7 +308,7 @@ fun GameUI(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Display the countdown timer
-        Text(text = "Temps restant : $timerValue secondes", fontSize = 18.sp, color = Color.Black)
+        // Text(text = "Temps restant : $timerValue secondes", fontSize = 18.sp, color = Color.Black)
     }
 
     DisposableEffect(Unit) {
@@ -424,9 +410,10 @@ fun ExplosionAnimation() {
 
     LaunchedEffect(Unit) {
         while (currentFrame < explosionImages.size - 1) {
-            delay(200L) // Adjust the delay to control the animation speed
+            delay(500) // Adjust the delay to control the animation speed
             currentFrame++
         }
+        delay(2000)
     }
 
     Image(
