@@ -153,7 +153,7 @@ Bienvenue dans **La Taverne au Jeu**, une application mobile Android de mini-jeu
 2. **Installation**
    - Cloner le projet :
      ```bash
-     git clone [<lien-du-repo>](https://github.com/kiurow590/UQAC-Prog-Mobile-Project-App)
+     git clone https://github.com/kiurow590/UQAC-Prog-Mobile-Project-App
      ```
    - Ouvrir dans Android Studio.
    - Synchroniser Gradle.
