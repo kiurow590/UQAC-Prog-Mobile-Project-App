@@ -45,31 +45,100 @@ Bienvenue dans **La Taverne au Jeu**, une application mobile Android de mini-jeu
 ## 🔥 Architecture du projet
 
 ```plaintext
-├── mainActivity/
-│   ├── MainActivity.kt — Connexion utilisateur
-│   ├── GoogleAuthHelper.kt — Gestion authentification Google
-│   ├── MainActivityComposableLayout.kt — Écran principal
-├── gameChoose/
-│   ├── GameChoose.kt — Sélection de jeux
-│   ├── GameDetailActivity.kt — Détail d'un jeu
-│   ├── GameSettingsActivity.kt — Paramétrage des parties
-│   ├── FinalResult.kt — Résultats et sauvegarde
-│   └── AccountDialogActivity.kt — Affichage de compte
-├── gameHistory/
-│   ├── GameHistoryActivity.kt — Historique des parties
-├── games/
-│   ├── bomberGames/ — *Et Boom!* (jeu de mots et reconnaissance vocale)
-│   ├── triMann/ — *TriMann* (jeu de dés)
-│   ├── werewolfGame/ — *Bleiz-Garou* (jeu de rôle)
-├── settings/
-│   ├── SettingsDialogFragment.kt — Langue, Volume
-├── utils/
-│   ├── LanguageManager.kt — Gestion multilingue
-│   ├── SpeechRecognizerHelper.kt — Reconnaissance vocale
-├── ui/theme/
-│   ├── Theme.kt — Thème clair/sombre
-│   └── Type.kt — Styles de texte
-└── BaseActivity.kt — Support multilingue global
+.
+├── README.md
+├── app
+│   └── src
+│       ├── main
+│           ├── AndroidManifest.xml
+│           ├── java
+│           │   └── com
+│           │       └── example
+│           │           └── uqac_progmob_project
+│           │               ├── BaseActivity.kt
+│           │               ├── LanguageManager.kt
+│           │               ├── gameChoose
+│           │               │   ├── AccountDialogActivity.kt
+│           │               │   ├── FinalResult.kt
+│           │               │   ├── GameChoose.kt
+│           │               │   ├── GameDetailActivity.kt
+│           │               │   └── GameSettingsActivity.kt
+│           │               ├── gameHistory
+│           │               │   └── GameHistoryActivity.kt
+│           │               ├── games
+│           │               │   ├── bomberGames
+│           │               │   │   ├── BombGames.kt
+│           │               │   │   └── SpeechRecognizerHelper.kt
+│           │               │   ├── triMann
+│           │               │   │   └── TriMannGame.kt
+│           │               │   └── werewolfGame
+│           │               │       └── WerewolfGame.kt
+│           │               ├── mainActivity
+│           │               │   ├── GoogleAuthHelper.kt
+│           │               │   ├── MainActivity.kt
+│           │               │   └── MainActivityComposableLayout.kt
+│           │               ├── settings
+│           │               │   └── SettingsDialogFragment.kt
+│           │               └── ui
+│           │                   └── theme
+│           │                       ├── Color.kt
+│           │                       ├── Theme.kt
+│           │                       └── Type.kt
+│           └── res
+│               ├── drawable
+│               │   ├── baseline_close_24.xml
+│               │   ├── baseline_keyboard_backspace_24.xml
+│               │   ├── baseline_person_24.xml
+│               │   ├── bomb_character_o_explode0.png
+│               │   ├── bomb_character_o_explode1.png
+│               │   ├── bomb_character_o_explode2.png
+│               │   ├── bomb_character_o_explode3.png
+│               │   ├── bomb_character_o_idle.png
+│               │   ├── dice1.png
+│               │   ├── dice2.png
+│               │   ├── dice3.png
+│               │   ├── dice4.png
+│               │   ├── dice5.png
+│               │   ├── dice6.png
+│               │   ├── ic_arrow_down.xml
+│               │   ├── ic_arrow_up.xml
+│               │   ├── ic_launcher_background.xml
+│               │   ├── ic_launcher_foreground.xml
+│               │   ├── manage_search_32dp_e3e3e3_fill0_wght400_grad0_opsz40.xml
+│               │   ├── ouest_forge_game.png
+│               │   ├── public_32dp_e3e3e3_fill0_wght400_grad0_opsz40.xml
+│               │   ├── taverne_au_jeux.png
+│               │   ├── trophee.xml
+│               │   └── volume_up_32dp_e3e3e3_fill0_wght400_grad0_opsz40.xml
+│               ├── mipmap-anydpi-v26
+│               │   ├── ic_launcher.xml
+│               │   └── ic_launcher_round.xml
+│               ├── mipmap-hdpi
+│               │   ├── ic_launcher.webp
+│               │   └── ic_launcher_round.webp
+│               ├── mipmap-mdpi
+│               │   ├── ic_launcher.webp
+│               │   └── ic_launcher_round.webp
+│               ├── mipmap-xhdpi
+│               │   ├── ic_launcher.webp
+│               │   └── ic_launcher_round.webp
+│               ├── mipmap-xxhdpi
+│               │   ├── ic_launcher.webp
+│               │   └── ic_launcher_round.webp
+│               ├── mipmap-xxxhdpi
+│               │   ├── ic_launcher.webp
+│               │   └── ic_launcher_round.webp
+│               ├── values
+│               │   ├── colors.xml
+│               │   ├── strings.xml
+│               │   └── themes.xml
+│               ├── values-fr
+│               │   └── string.xml
+│               └── xml
+│                   ├── backup_rules.xml
+│                   └── data_extraction_rules.xml
+├── assets
+    └── demo.webm
 ```
 
 ---
