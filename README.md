@@ -4,6 +4,10 @@
 
 Bienvenue dans **La Taverne au Jeu**, une application mobile Android de mini-jeux multijoueurs développée avec **Jetpack Compose** et **Firebase** !
 
+## Etudiant :
+- Thomas LE BARON, LEBT04070000
+- Jérémy LEGRIX, LEGJ22070000
+- Aubry TONNERRE, TONA19040200
 ---
 
 ## 📱 Fonctionnalités principales
